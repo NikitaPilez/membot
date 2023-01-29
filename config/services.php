@@ -34,5 +34,9 @@ return [
     'telegram' => [
         'api_key' => env('TELEGRAM_API_KEY'),
         'chat_id' => env('TELEGRAM_CHAT_ID')
+    ],
+
+    'google' => [
+        'api_key' => env('GOOGLE_API_KEY')
     ]
 ];
