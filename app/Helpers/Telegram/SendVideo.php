@@ -11,7 +11,7 @@ class SendVideo
     {
         $params = [
             'chat_id' => config('services.telegram.chat_id'),
-            'video' => env('APP_URL') . '/videos/' . $video->name
+            'video' => env('APP_URL') . '/' . $video->name
         ];
 
         $ch = curl_init('https://api.telegram.org/' . config('services.telegram.api_key') . '/sendVideo');

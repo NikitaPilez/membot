@@ -50,7 +50,7 @@ class GoogleDriveService
             // TODO Check if downloaded
             $response = $this->service->files->get($file->getId(), array(
                 'alt' => 'media'));
-            file_put_contents(public_path() . '/videos/' . $file->getName(), $response->getBody()->getContents());
+            file_put_contents(public_path() . '/' . $file->getName(), $response->getBody()->getContents());
 
             Video::create([
                 'name' => $file->getName(),
