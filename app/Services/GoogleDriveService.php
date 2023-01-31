@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use Google\Client;
-use Google\Service;
+use App\Models\Video;
+use Google\Service\Drive;
+use Google\Service\Drive\DriveFile;
 use Google_Client;
 use Google_Service_Drive;
-use Illuminate\Support\Arr;
 
 class GoogleDriveService
 {
@@ -19,31 +19,43 @@ class GoogleDriveService
         $this->client->setClientId(config('services.google.client_id'));
         $this->client->setClientSecret(config('services.google.client_secret'));
         $this->client->refreshToken(config('services.google.refresh_token'));
+        $this->client->addScope(Drive::DRIVE);
         $this->service = new Google_Service_Drive($this->client);
     }
 
-    public function download()
+    public function getFiles(string $folderId): array
     {
-        $folderId = config('services.google.mem_video_folder_id');
-
         $folderFiles = $this->service->files->listFiles(['q' => "'{$folderId}' in parents and trashed = false"]);
-
-        $fileId = Arr::get($folderFiles->files, '0')?->id;
-
-        if (!$fileId) {
-            return;
-        }
-
-        $fileInfo = $this->service->files->get($fileId, ['fields' => 'webContentLink']);
-
-        return [
-            $fileInfo->getWebContentLink(),
-            $fileId
-        ];
+        return $folderFiles->getFiles();
     }
 
-    public function delete(string $fileId)
+    /**
+     * @param DriveFile[] $files
+     * @return void
+     */
+    public function deleteFiles(array $files): void
     {
-        $this->service->files->delete($fileId);
+        foreach ($files as $file) {
+            $this->service->files->delete($file->getId());
+        }
+    }
+
+    /**
+     * @param DriveFile[] $files
+     * @return void
+     */
+    public function downloadFiles(array $files): void
+    {
+        foreach ($files as $file) {
+            // TODO Check if downloaded
+            $response = $this->service->files->get($file->getId(), array(
+                'alt' => 'media'));
+            file_put_contents(public_path() . '/videos/' . $file->getName(), $response->getBody()->getContents());
+
+            Video::create([
+                'name' => $file->getName(),
+                'file_id' => $file->getId(),
+            ]);
+        }
     }
 }

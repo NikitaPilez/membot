@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DriveController;
+use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\MessageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +21,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/sendMessage', [MessageController::class, 'sendMessage']);
-Route::get('/drive/getFiles', [DriveController::class, 'getFiles']);
-Route::get('/download', [\App\Http\Controllers\GoogleController::class, 'download']);
+Route::post('/processedVideos', [MessageController::class, 'processedVideos']);
+Route::get('/download', [GoogleController::class, 'download']);

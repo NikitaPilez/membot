@@ -3,21 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Services\GoogleDriveService;
+use Google\Service\Drive\DriveFile;
+use Illuminate\Http\JsonResponse;
 
 class GoogleController
 {
     public function __construct(protected GoogleDriveService $googleDriveService) {}
 
-    public function download()
+    public function download(): JsonResponse
     {
-        [$downloadLink, $fileId] = $this->googleDriveService->download();
-
-        if (!$fileId) {
-            return;
-        }
-
-        //todo download and send to tg
-
-        $this->googleDriveService->delete($fileId);
+        /** @var DriveFile[] $files */
+        $files = $this->googleDriveService->getFiles("1e5GiW8Kzh3dmLnsOArp1U6miVCaeYhrD");
+        $this->googleDriveService->downloadFiles($files);
+//        $this->googleDriveService->deleteFiles($files);
+        return response()->json(['data' => true]);
     }
 }
