@@ -13,7 +13,7 @@ class GoogleController
     public function download(): JsonResponse
     {
         /** @var DriveFile[] $files */
-        $files = $this->googleDriveService->getFiles("1e5GiW8Kzh3dmLnsOArp1U6miVCaeYhrD");
+        $files = $this->googleDriveService->getFiles(config('services.google.mem_video_folder_id'));
         $this->googleDriveService->downloadFiles($files);
 //        $this->googleDriveService->deleteFiles($files);
         return response()->json(['data' => true]);
