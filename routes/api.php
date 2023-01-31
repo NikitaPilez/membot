@@ -22,3 +22,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('/sendMessage', [MessageController::class, 'sendMessage']);
 Route::get('/drive/getFiles', [DriveController::class, 'getFiles']);
+Route::get('/download', [\App\Http\Controllers\GoogleController::class, 'download']);

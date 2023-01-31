@@ -37,6 +37,10 @@ return [
     ],
 
     'google' => [
-        'api_key' => env('GOOGLE_API_KEY')
+        'api_key' => env('GOOGLE_API_KEY'),
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'refresh_token' => env('GOOGLE_REFRESH_TOKEN'),
+        'mem_video_folder_id' => env('GOOGLE_MEM_VIDEO_FOLDER_ID'),
     ]
 ];
