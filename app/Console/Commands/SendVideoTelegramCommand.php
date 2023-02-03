@@ -21,6 +21,8 @@ class SendVideoTelegramCommand extends Command
 
         $video = Video::query()->where('is_sent', 0)->inRandomOrder()->first();
 
-        SendVideoTelegramJob::dispatch($video);
+        if ($video) {
+            SendVideoTelegramJob::dispatch($video);
+        }
     }
 }
