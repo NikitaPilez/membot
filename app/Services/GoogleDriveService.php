@@ -46,7 +46,7 @@ class GoogleDriveService
      */
     public function downloadFiles(array $files): void
     {
-        $videoIds = Video::where('is_sent', 0)->pluck('file_id') ?? [];
+        $videoIds = Video::pluck('file_id')->toArray();
 
         foreach ($files as $file) {
             if (!in_array($file->getId(), $videoIds)) {
