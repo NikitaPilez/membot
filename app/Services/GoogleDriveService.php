@@ -46,16 +46,19 @@ class GoogleDriveService
      */
     public function downloadFiles(array $files): void
     {
-        foreach ($files as $file) {
-            // TODO Check if downloaded
-            $response = $this->service->files->get($file->getId(), array(
-                'alt' => 'media'));
-            file_put_contents(public_path() . '/' . $file->getName(), $response->getBody()->getContents());
+        $videoIds = Video::where('is_sent', 0)->pluck('file_id');
 
-            Video::create([
-                'name' => $file->getName(),
-                'file_id' => $file->getId(),
-            ]);
+        foreach ($files as $file) {
+            if (!in_array($file->getId(), $videoIds)) {
+                $response = $this->service->files->get($file->getId(), array(
+                    'alt' => 'media'));
+                file_put_contents(public_path() . '/' . $file->getName(), $response->getBody()->getContents());
+
+                Video::create([
+                    'name' => $file->getName(),
+                    'file_id' => $file->getId(),
+                ]);
+            }
         }
     }
 }
