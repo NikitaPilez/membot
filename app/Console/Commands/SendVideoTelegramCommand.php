@@ -23,6 +23,7 @@ class SendVideoTelegramCommand extends Command
             if (!in_array($file->getId(), $videoIds)) {
                 $video = $googleDriveService->downloadFile($file);
                 SendVideoTelegramJob::dispatch($video);
+                return;
             }
         }
     }
