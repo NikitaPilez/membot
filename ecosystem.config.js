@@ -4,7 +4,7 @@ module.exports = {
             name: 'schedule',
             interpreter: '/usr/bin/php8.1',
             script: './artisan',
-            args: 'schedule:run',
+            args: 'schedule:work',
             instances: 1,
             autorestart: true,
             watch: false,
