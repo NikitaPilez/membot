@@ -17,12 +17,13 @@ class SendVideoTelegramCommand extends Command
     {
         $files = $googleDriveService->getFiles(config('services.google.mem_video_folder_id'));
 
-        $googleDriveService->downloadFiles($files);
+        $videoIds = Video::pluck('file_id')->toArray();
 
-        $video = Video::query()->where('is_sent', 0)->inRandomOrder()->first();
-
-        if($video) {
-            SendVideoTelegramJob::dispatch($video);
+        foreach ($files as $file) {
+            if (!in_array($file->getId(), $videoIds)) {
+                $video = $googleDriveService->downloadFile($file);
+                SendVideoTelegramJob::dispatch($video);
+            }
         }
     }
 }

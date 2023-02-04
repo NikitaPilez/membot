@@ -23,6 +23,10 @@ class GoogleDriveService
         $this->service = new Google_Service_Drive($this->client);
     }
 
+    /**
+     * @param string $folderId
+     * @return DriveFile[]
+     */
     public function getFiles(string $folderId): array
     {
         $folderFiles = $this->service->files->listFiles(['q' => "'{$folderId}' in parents and trashed = false"]);
@@ -41,24 +45,18 @@ class GoogleDriveService
     }
 
     /**
-     * @param DriveFile[] $files
-     * @return void
+     * @param DriveFile $file
+     * @return Video
      */
-    public function downloadFiles(array $files): void
+    public function downloadFile(DriveFile $file): Video
     {
-        $videoIds = Video::pluck('file_id')->toArray();
+        $response = $this->service->files->get($file->getId(), array(
+            'alt' => 'media'));
+        file_put_contents(public_path() . '/' . $file->getName(), $response->getBody()->getContents());
 
-        foreach ($files as $file) {
-            if (!in_array($file->getId(), $videoIds)) {
-                $response = $this->service->files->get($file->getId(), array(
-                    'alt' => 'media'));
-                file_put_contents(public_path() . '/' . $file->getName(), $response->getBody()->getContents());
-
-                Video::create([
-                    'name' => $file->getName(),
-                    'file_id' => $file->getId(),
-                ]);
-            }
-        }
+        return Video::create([
+            'name' => $file->getName(),
+            'file_id' => $file->getId(),
+        ]);
     }
 }
