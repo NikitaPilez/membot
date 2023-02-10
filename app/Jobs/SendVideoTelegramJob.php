@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\File;
 
 class SendVideoTelegramJob implements ShouldQueue
 {
@@ -23,6 +24,13 @@ class SendVideoTelegramJob implements ShouldQueue
 
     public function handle()
     {
-        SendVideo::execute($this->video);
+        $response = SendVideo::execute($this->video);
+
+        if ($response["ok"]) {
+            $this->video->is_sent = 1;
+            $this->video->save();
+
+            File::delete(public_path($this->video->name));
+        }
     }
 }
