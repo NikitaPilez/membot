@@ -12,8 +12,7 @@ class SendVideo
     {
         $params = [
             'chat_id' => config('services.telegram.chat_id'),
-//            'video' => env('APP_URL') . '/' . $video->name
-            'video' => "https://mem.wiggaz.xyz/fdsf2.mp4"
+            'video' => env('APP_URL') . '/' . $video->name
         ];
 
         $url = "https://api.telegram.org/" . config('services.telegram.api_key') . "/sendVideo";
