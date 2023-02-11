@@ -60,7 +60,7 @@ class GoogleDriveService
         ]);
     }
 
-    public function exportFile()
+    public function createFile()
     {
         $fileMetadata = new Drive\DriveFile(['name' => 'test.mp4']);
 //        $content = file_get_contents(public_path($path)); todo
