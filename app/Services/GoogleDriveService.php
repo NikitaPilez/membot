@@ -50,13 +50,26 @@ class GoogleDriveService
      */
     public function downloadFile(DriveFile $file): Video
     {
-        $response = $this->service->files->get($file->getId(), array(
-            'alt' => 'media'));
+        $response = $this->service->files->get($file->getId(), ['alt' => 'media']);
+
         file_put_contents(public_path() . '/' . $file->getName(), $response->getBody()->getContents());
 
         return Video::create([
             'name' => $file->getName(),
             'file_id' => $file->getId(),
+        ]);
+    }
+
+    public function exportFile()
+    {
+        $fileMetadata = new Drive\DriveFile(['name' => 'test.mp4']);
+//        $content = file_get_contents(public_path($path)); todo
+
+        return $this->service->files->create($fileMetadata, [
+//            'data' => $content,
+            'mimeType' => 'video/mp4',
+            'uploadType' => 'multipart',
+            'fields' => 'id'
         ]);
     }
 }
