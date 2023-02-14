@@ -7,6 +7,7 @@ use Google\Service\Drive;
 use Google\Service\Drive\DriveFile;
 use Google_Client;
 use Google_Service_Drive;
+use Illuminate\Support\Str;
 
 class GoogleDriveService
 {
@@ -30,6 +31,7 @@ class GoogleDriveService
     public function getFiles(string $folderId): array
     {
         $folderFiles = $this->service->files->listFiles(['q' => "'{$folderId}' in parents and trashed = false"]);
+
         return $folderFiles->getFiles();
     }
 
@@ -60,16 +62,18 @@ class GoogleDriveService
         ]);
     }
 
-    public function createFile()
+    public function createFile(string $content)
     {
-        $fileMetadata = new Drive\DriveFile(['name' => 'test.mp4']);
-//        $content = file_get_contents(public_path($path)); todo
+        $fileMetadata = new Drive\DriveFile([
+            'parents' => [config('services.google.mem_video_folder_id')],
+            'name' => Str::random(24).'.mp4'
+        ]);
 
         return $this->service->files->create($fileMetadata, [
-//            'data' => $content,
+            'data' => $content,
             'mimeType' => 'video/mp4',
             'uploadType' => 'multipart',
-            'fields' => 'id'
+            'fields' => 'id',
         ]);
     }
 }
