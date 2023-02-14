@@ -33,7 +33,10 @@ return [
 
     'telegram' => [
         'api_key' => env('TELEGRAM_API_KEY'),
-        'chat_id' => env('TELEGRAM_CHAT_ID')
+        'chat_id' => env('TELEGRAM_CHAT_ID'),
+        'api_id' => env('TELEGRAM_API_ID'),
+        'api_hash' => env('TELEGRAM_API_HASH'),
+        'manager_ids' => env('TELEGRAM_MANAGER_IDS')
     ],
 
     'google' => [

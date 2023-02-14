@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Helpers\Telegram\SendVideo;
 use App\Models\Video;
+use App\Services\TelegramService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -22,9 +22,9 @@ class SendVideoTelegramJob implements ShouldQueue
         $this->video = $video;
     }
 
-    public function handle()
+    public function handle(TelegramService $telegramService)
     {
-        $response = SendVideo::execute($this->video);
+        $response = $telegramService->sendVideo($this->video);
 
         if ($response["ok"]) {
             $this->video->is_sent = 1;
