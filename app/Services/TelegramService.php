@@ -47,12 +47,14 @@ class TelegramService
     public function sendErrorLog()
     {
         $url =  $this->apiUrl . "/sendDocument";
-        $response = Http::attach('document', fopen(storage_path("logs/laravel.log"), 'r'))->post($url, [
-            'chat_id' => $this->memChatId,
-        ]);
+        $managerIds = explode(",", config('services.telegram.manager_ids'));
+        foreach ($managerIds as $managerId) {
+            $response = Http::attach('document', fopen(storage_path("logs/laravel.log"), 'r'))->post($url, [
+                'chat_id' => $managerId,
+            ]);
 
-        Log::info($response->json());
-        return $response->json();
+            Log::info($response->json());
+        }
     }
 
     public function getChannelStats()
