@@ -44,6 +44,17 @@ class TelegramService
         return $response->json();
     }
 
+    public function sendErrorLog()
+    {
+        $url =  $this->apiUrl . "/sendDocument";
+        $response = Http::attach('document', fopen(storage_path("logs/laravel.log"), 'r'))->post($url, [
+            'chat_id' => $this->memChatId,
+        ]);
+
+        Log::info($response->json());
+        return $response->json();
+    }
+
     public function getChannelStats()
     {
         return $this->proto->getFullInfo($this->memChatId);
