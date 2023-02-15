@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
         {
-            name: 'Schedule',
+            name: 'schedule',
             interpreter: '/usr/bin/php8.1',
             script: './artisan',
             args: 'schedule:work',
@@ -14,7 +14,7 @@ module.exports = {
             max_restarts: 15,
         },
         {
-            name: 'Queue',
+            name: 'queue',
             interpreter: '/usr/bin/php8.1',
             script: './artisan',
             args: 'queue:work',
