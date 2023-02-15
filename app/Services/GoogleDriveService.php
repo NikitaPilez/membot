@@ -7,13 +7,12 @@ use Google\Service\Drive;
 use Google\Service\Drive\DriveFile;
 use Google_Client;
 use Google_Service_Drive;
-use Illuminate\Support\Str;
 
 class GoogleDriveService
 {
-    protected $client;
+    protected Google_Client $client;
 
-    protected $service;
+    protected Google_Service_Drive $service;
 
     public function __construct() {
         $this->client = new Google_Client();
@@ -64,9 +63,9 @@ class GoogleDriveService
 
     public function createFile(string $content)
     {
-        $fileMetadata = new Drive\DriveFile([
+        $fileMetadata = new DriveFile([
             'parents' => [config('services.google.mem_video_folder_id')],
-            'name' => Str::random(24).'.mp4'
+            'name' => date('Y-m-d H:i') . '.mp4'
         ]);
 
         return $this->service->files->create($fileMetadata, [

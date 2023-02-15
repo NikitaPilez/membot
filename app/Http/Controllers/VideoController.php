@@ -2,25 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\InstagramDownloadService;
-use App\Services\TiktokDownloadService;
-use App\Services\YoutubeDownloadService;
+use App\Jobs\DownloadVideoJob;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class VideoController
 {
-    public function downloadVideo(
-        Request $request,
-        InstagramDownloadService $instagramDownloadService,
-        TiktokDownloadService $tiktokDownloadService,
-        YoutubeDownloadService $youtubeDownloadService
-    ) {
-        $url = $request->input('url');
+    public function downloadVideo(Request $request): JsonResponse
+    {
+        DownloadVideoJob::dispatch($request->input("url"), $request->input("type"));
 
-        match ($request->input('type')) {
-            'tiktok' => $tiktokDownloadService->download($url),
-            'instagram' => $instagramDownloadService->download($url),
-            'shorts' => $youtubeDownloadService->shortsDownload($url),
-        };
+        return response()->json(['data' => 'success']);
     }
 }

@@ -1,20 +1,26 @@
 <?php
 
-namespace App\Services;
+namespace App\Helpers\Download;
 
-class TiktokDownloadService
+use App\Services\GoogleDriveService;
+use Illuminate\Support\Facades\Log;
+
+class TikTokDownloadVideo implements DownloadVideoInterface
 {
+
     public function download(string $url)
     {
-        $response = $this->getContent($url);
-        $encodedUrlArr = explode('"downloadAddr":"', $response);
+        $content = $this->getContent($url);
+        $encodedUrlArr = explode('"downloadAddr":"', $content);
 
         if (count($encodedUrlArr) < 1) {
-           //error //todo
+            // TODO Error
         }
 
         $encodedUrl = explode("\"", $encodedUrlArr[1])[0];
         $contentUrl = $this->escape_sequence_decode($encodedUrl);
+
+        Log::info("Downloaded tiktok video, content url " . $contentUrl);
 
         $ch = curl_init();
 
@@ -27,7 +33,7 @@ class TiktokDownloadService
             ],
             CURLOPT_FOLLOWLOCATION => true,
             CURLINFO_HEADER_OUT    => true,
-            CURLOPT_USERAGENT => 'okhttp',
+            CURLOPT_USERAGENT      => 'okhttp',
             CURLOPT_ENCODING       => "utf-8",
             CURLOPT_AUTOREFERER    => true,
             CURLOPT_COOKIEJAR      => 'cookie.txt',
@@ -49,7 +55,7 @@ class TiktokDownloadService
         app(GoogleDriveService::class)->createFile($data);
     }
 
-    public function getContent(string $url)
+    private function getContent(string $url): string
     {
         $ch = curl_init();
 
@@ -80,9 +86,8 @@ class TiktokDownloadService
         return strval($data);
     }
 
-    function escape_sequence_decode(string $str)
+    private function escape_sequence_decode(string $str)
     {
-        // [U+D800 - U+DBFF][U+DC00 - U+DFFF]|[U+0000 - U+FFFF]
         $regex = '/\\\u([dD][89abAB][\da-fA-F]{2})\\\u([dD][c-fC-F][\da-fA-F]{2})|\\\u([\da-fA-F]{4})/sx';
 
         return preg_replace_callback($regex, function ($matches) {
@@ -92,18 +97,12 @@ class TiktokDownloadService
                 $lead = hexdec($matches[1]);
                 $trail = hexdec($matches[2]);
 
-                // http://unicode.org/faq/utf_bom.html#utf16-4
                 $cp = ($lead << 10) + $trail + 0x10000 - (0xD800 << 10) - 0xDC00;
             }
 
-            // https://tools.ietf.org/html/rfc3629#section-3
-            // Characters between U+D800 and U+DFFF are not allowed in UTF-8
             if ($cp > 0xD7FF && 0xE000 > $cp) {
                 $cp = 0xFFFD;
             }
-
-            // https://github.com/php/php-src/blob/php-5.6.4/ext/standard/html.c#L471
-            // php_utf32_utf8(unsigned char *buf, unsigned k)
 
             if ($cp < 0x80) {
                 return chr($cp);

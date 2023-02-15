@@ -13,7 +13,8 @@
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
-        "opcodesio/log-viewer": "^1.9"
+        "opcodesio/log-viewer": "^1.9",
+        "ext-curl": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

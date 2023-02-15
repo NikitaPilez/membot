@@ -47,7 +47,9 @@ class Handler extends ExceptionHandler
         $telegramService = new TelegramService();
 
         $this->reportable(function (Throwable $e) use ($telegramService) {
-            $telegramService->sendErrorLog();
+            if (config('app.env') !== "local") {
+                $telegramService->sendErrorLog();
+            }
         });
     }
 }
