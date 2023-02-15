@@ -1,10 +1,23 @@
 module.exports = {
     apps: [
         {
-            name: 'schedule',
+            name: 'Schedule',
             interpreter: '/usr/bin/php8.1',
             script: './artisan',
             args: 'schedule:work',
+            instances: 1,
+            autorestart: true,
+            watch: false,
+            max_memory_restart: '256M',
+            kill_timeout: 20000,
+            restart_delay: 5000,
+            max_restarts: 15,
+        },
+        {
+            name: 'Queue',
+            interpreter: '/usr/bin/php8.1',
+            script: './artisan',
+            args: 'queue:work',
             instances: 1,
             autorestart: true,
             watch: false,
