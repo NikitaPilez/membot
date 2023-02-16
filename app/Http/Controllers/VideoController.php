@@ -10,7 +10,17 @@ class VideoController
 {
     public function downloadVideo(Request $request): JsonResponse
     {
-        DownloadVideoJob::dispatch($request->input("url"), $request->input("type"));
+        $url = $request->input("url");
+
+        $type = collect([
+            'instagram.com' => 'instagram',
+            'youtube.com/shorts' => 'youtube',
+            'tiktok.com' => 'tiktok',
+        ])->firstWhere(function ($value, $key) use ($url) {
+            return str_contains($url, $key);
+        });
+
+        DownloadVideoJob::dispatch($url, $type);
 
         return response()->json(['data' => 'success']);
     }
