@@ -16,16 +16,11 @@ class InstagramDownloadVideo implements DownloadVideoInterface
         $browser = $browserFactory->createBrowser();
 
         $page = $browser->createPage();
-        $page->navigate($url)->waitForNavigation(Page::NETWORK_IDLE);
+        $page->navigate($url)->waitForNavigation();
         $html = $page->getHtml(20000);
 
-        preg_match('/(?=https:\/\/scontent-waw1-1\.cdninstagram\.com).{1,110}(?=mp4\?).*?"/', $html, $matches);
-
-        if (!$videoUrlWithBrackets = current($matches)) {
-            // TODO Error
-        }
-
-        $videoUrl = str_replace('amp;', '', str_replace('"', '', $videoUrlWithBrackets));
+        preg_match('/"contentUrl":"(.*?)"/', $html, $match);
+        $videoUrl = stripslashes(json_decode('"' . $match[1] . '"'));
         Log::info("Downloaded instagram video, content url " . $videoUrl);
 
         app(GoogleDriveService::class)->createFile(file_get_contents($videoUrl));
