@@ -5,12 +5,12 @@ namespace App\Helpers\Download;
 use App\Services\GoogleDriveService;
 use Illuminate\Support\Facades\Log;
 
-class TikTokDownloadVideo implements DownloadVideoInterface
+class TikTokContentVideo implements ContentVideoInterface
 {
 
-    public function download(string $url)
+    public function getContent(string $url): string
     {
-        $content = $this->getContent($url);
+        $content = $this->getContentByUrl($url);
         $encodedUrlArr = explode('"downloadAddr":"', $content);
 
         if (count($encodedUrlArr) < 1) {
@@ -52,10 +52,10 @@ class TikTokDownloadVideo implements DownloadVideoInterface
 
         curl_close($ch);
 
-        app(GoogleDriveService::class)->createFile($data);
+        return $data;
     }
 
-    private function getContent(string $url): string
+    private function getContentByUrl(string $url): string
     {
         $ch = curl_init();
 

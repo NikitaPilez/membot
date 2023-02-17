@@ -2,9 +2,10 @@
 
 namespace App\Jobs;
 
-use App\Helpers\Download\InstagramDownloadVideo;
-use App\Helpers\Download\TikTokDownloadVideo;
-use App\Helpers\Download\YoutubeDownloadVideo;
+use App\Helpers\Download\InstagramContent;
+use App\Helpers\Download\TikTokContentVideo;
+use App\Helpers\Download\YoutubeContentVideo;
+use App\Services\GoogleDriveService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -27,11 +28,13 @@ class DownloadVideoJob implements ShouldQueue
     public function handle()
     {
         $videoDownloader = match ($this->type) {
-            "tiktok" => new TikTokDownloadVideo(),
-            "youtube" => new YoutubeDownloadVideo(),
-            "instagram" => new InstagramDownloadVideo()
+            "tiktok" => new TikTokContentVideo(),
+            "youtube" => new YoutubeContentVideo(),
+            "instagram" => new InstagramContent()
         };
 
-        $videoDownloader->download($this->url);
+        $content = $videoDownloader->getContent($this->url);
+
+        app(GoogleDriveService::class)->createFile($content);
     }
 }
