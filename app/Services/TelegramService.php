@@ -3,9 +3,6 @@
 namespace App\Services;
 
 use App\Models\Video;
-use danog\MadelineProto\API;
-use danog\MadelineProto\Settings;
-use danog\MadelineProto\Settings\AppInfo;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -13,15 +10,12 @@ class TelegramService
 {
     private string $memChatId;
     private string $apiUrl;
-    private API $proto;
 
     public function __construct()
     {
         $telegramApiKey = config('services.telegram.api_key');
         $this->apiUrl = "https://api.telegram.org/" . $telegramApiKey;
         $this->memChatId = config('services.telegram.chat_id');
-        $this->proto = new API("/tmp");
-        $this->proto->start();
     }
 
     public function sendVideo(Video $video)
@@ -55,6 +49,7 @@ class TelegramService
 
     public function getChannelStats()
     {
-        return $this->proto->getFullInfo($this->memChatId);
+        $proto = MTProtoSingleton::getProtoInstance();
+        return $proto->getFullInfo($this->memChatId);
     }
 }
