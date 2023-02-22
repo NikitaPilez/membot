@@ -7,24 +7,12 @@ use Illuminate\Support\Facades\Log;
 class TikTokContentVideo implements ContentVideoInterface
 {
 
-    public function getContent(string $url): string
+    public function getContent(string $sourceUrl)
     {
-        $content = $this->getContentByUrl($url);
-        $encodedUrlArr = explode('"downloadAddr":"', $content);
-
-        if (count($encodedUrlArr) < 1) {
-            // TODO Error
-        }
-
-        $encodedUrl = explode("\"", $encodedUrlArr[1])[0];
-        $contentUrl = $this->escape_sequence_decode($encodedUrl);
-
-        Log::info("Downloaded tiktok video, content url " . $contentUrl);
-
         $ch = curl_init();
 
         $options = [
-            CURLOPT_URL            => $contentUrl,
+            CURLOPT_URL            => $sourceUrl,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER         => false,
             CURLOPT_HTTPHEADER     => [
@@ -54,12 +42,12 @@ class TikTokContentVideo implements ContentVideoInterface
         return $data;
     }
 
-    private function getContentByUrl(string $url): string
+    public function getContentUrl(string $videoUrl): string
     {
         $ch = curl_init();
 
         $options = [
-            CURLOPT_URL            => $url,
+            CURLOPT_URL            => $videoUrl,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER         => false,
             CURLOPT_FOLLOWLOCATION => true,
@@ -82,7 +70,20 @@ class TikTokContentVideo implements ContentVideoInterface
 
         curl_close($ch);
 
-        return strval($data);
+        $content = strval($data);
+
+        $encodedUrlArr = explode('"downloadAddr":"', $content);
+
+        if (count($encodedUrlArr) < 1) {
+            // TODO Error
+        }
+
+        $encodedUrl = explode("\"", $encodedUrlArr[1])[0];
+        $sourceUrl = $this->escape_sequence_decode($encodedUrl);
+
+        Log::info("Tiktok video, source url " . $sourceUrl);
+
+        return $sourceUrl;
     }
 
     private function escape_sequence_decode(string $str)

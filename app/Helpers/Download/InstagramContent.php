@@ -8,19 +8,24 @@ use Illuminate\Support\Facades\Log;
 class InstagramContent implements ContentVideoInterface
 {
 
-    public function getContent(string $url)
+    public function getContent(string $sourceUrl)
+    {
+        return file_get_contents($sourceUrl);
+    }
+
+    public function getContentUrl(string $videoUrl): string
     {
         $browserFactory = new BrowserFactory();
         $browser = $browserFactory->createBrowser();
 
         $page = $browser->createPage();
-        $page->navigate($url)->waitForNavigation();
+        $page->navigate($videoUrl)->waitForNavigation();
         $html = $page->getHtml(20000);
 
         preg_match('/"contentUrl":"(.*?)"/', $html, $match);
-        $videoUrl = stripslashes(json_decode('"' . $match[1] . '"'));
-        Log::info("Downloaded instagram video, content url " . $videoUrl);
+        $sourceUrl = stripslashes(json_decode('"' . $match[1] . '"'));
+        Log::info("Instagram video, source url " . $sourceUrl);
 
-        return file_get_contents($videoUrl);
+        return $sourceUrl;
     }
 }

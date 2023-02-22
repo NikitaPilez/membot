@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Video;
 use App\Services\TelegramService;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -28,6 +29,7 @@ class SendVideoTelegramJob implements ShouldQueue
 
         if ($response["ok"]) {
             $this->video->is_sent = 1;
+            $this->video->sent_at = Carbon::now();
             $this->video->save();
 
             File::delete(public_path($this->video->name));

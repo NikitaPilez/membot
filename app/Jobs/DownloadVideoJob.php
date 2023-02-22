@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Helpers\Download\InstagramContent;
 use App\Helpers\Download\TikTokContentVideo;
 use App\Helpers\Download\YoutubeContentVideo;
+use App\Models\Video;
 use App\Services\GoogleDriveService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -33,8 +34,20 @@ class DownloadVideoJob implements ShouldQueue
             "instagram" => new InstagramContent()
         };
 
-        $content = $videoDownloader->getContent($this->url);
+        $contentUrl = $videoDownloader->getContentUrl($this->url);
+        $content = $videoDownloader->getContent($contentUrl);
+        $fileName = $this->type . " " . date("Y-m-d H:i") . ".mp4";
 
-        app(GoogleDriveService::class)->createFile($content);
+        /** @var GoogleDriveService $googleDriveService */
+        $googleDriveService = app(GoogleDriveService::class);
+        $driveFile = $googleDriveService->createFile($content, $fileName);
+
+        Video::create([
+            "google_file_id" => $driveFile->getId(),
+            "name" => $fileName,
+            "url" => $this->url,
+            "content_url" => $contentUrl,
+            "type" => $this->type,
+        ]);
     }
 }

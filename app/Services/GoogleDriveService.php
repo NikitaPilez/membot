@@ -61,18 +61,18 @@ class GoogleDriveService
         ]);
     }
 
-    public function createFile(string $content)
+    public function createFile(string $content, string $fileName = null): DriveFile
     {
         $fileMetadata = new DriveFile([
-            'parents' => [config('services.google.mem_video_folder_id')],
-            'name' => date('Y-m-d H:i') . '.mp4'
+            "parents" => [config("services.google.mem_video_folder_id")],
+            "name" => $fileName ?? date("Y-m-d H:i") . ".mp4"
         ]);
 
         return $this->service->files->create($fileMetadata, [
-            'data' => $content,
-            'mimeType' => 'video/mp4',
-            'uploadType' => 'multipart',
-            'fields' => 'id',
+            "data" => $content,
+            "mimeType" => "video/mp4",
+            "uploadType" => "multipart",
+            "fields" => "id",
         ]);
     }
 }
