@@ -19,7 +19,7 @@ class SendVideoTelegramCommand extends Command
 //        $files = $googleDriveService->getFiles(config('services.google.mem_video_folder_id'));
         $files = $googleService->getFiles(config('services.google.mem_video_folder_id'));
 
-        $videoIds = Video::pluck('file_id')->toArray();
+        $videoIds = Video::pluck('google_file_id')->toArray();
 
         foreach ($files as $file) {
             if (!in_array($file['id'], $videoIds)) {

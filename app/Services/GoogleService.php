@@ -28,7 +28,7 @@ class GoogleService
 
         return Video::create([
             'name' => $file['name'],
-            'file_id' => $file['id'],
+            'google_file_id' => $file['id'],
         ]);
     }
 }

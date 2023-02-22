@@ -11,7 +11,11 @@ class Video extends Model
 
     protected $fillable = [
         'name',
-        'file_id',
-        'is_sent'
+        'google_file_id',
+        'is_sent',
+        'url',
+        'content_url',
+        'type',
+        'send_at'
     ];
 }

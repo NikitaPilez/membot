@@ -57,7 +57,7 @@ class GoogleDriveService
 
         return Video::create([
             'name' => $file->getName(),
-            'file_id' => $file->getId(),
+            'google_file_id' => $file->getId(),
         ]);
     }
 
