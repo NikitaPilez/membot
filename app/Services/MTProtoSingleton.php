@@ -10,7 +10,7 @@ class MTProtoSingleton
     public static function getProtoInstance()
     {
         if (!isset(self::$proto)) {
-            self::$proto = new API(storage_path() . "/session");
+            self::$proto = new API(storage_path() . "/framework/sessions/session");
         }
 
         self::$proto->start();
