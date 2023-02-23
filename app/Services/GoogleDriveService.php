@@ -55,10 +55,16 @@ class GoogleDriveService
 
         file_put_contents(public_path() . '/' . $file->getName(), $response->getBody()->getContents());
 
-        return Video::create([
-            'name' => $file->getName(),
-            'google_file_id' => $file->getId(),
-        ]);
+        $video = Video::where("google_file_id", $file->getId())->first();
+
+        if (!$video) {
+            $video = Video::create([
+                'name' => $file->getName(),
+                'google_file_id' => $file->getId(),
+            ]);
+        }
+
+        return $video;
     }
 
     public function createFile(string $content, string $fileName = null): DriveFile
