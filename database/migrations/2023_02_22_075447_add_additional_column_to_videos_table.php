@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::table('videos', function (Blueprint $table) {
             $table->renameColumn("file_id", "google_file_id");
-            $table->string("url", 55)->nullable();
+            $table->text("url")->nullable();
             $table->text("content_url")->nullable();
             $table->string("type", 55)->nullable();
             $table->dateTime("sent_at")->nullable();
