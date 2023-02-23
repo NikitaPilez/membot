@@ -21,20 +21,11 @@ class SendVideoTelegramCommand extends Command
 
         $video = Video::where("is_sent", 0)->first();
 
-        if ($video) {
-            foreach ($files as $file) {
-                if ($file->getId() == $video->google_file_id) {
-                    $video = $googleDriveService->downloadFile($file);
-                    SendVideoTelegramJob::dispatch($video);
-                }
-            }
-        } else {
-            foreach ($files as $file) {
-                if (!in_array($file->id, $videoIds)) {
-                    $video = $googleDriveService->downloadFile($file);
-                    SendVideoTelegramJob::dispatch($video);
-                    return;
-                }
+        foreach ($files as $file) {
+            if (!in_array($file->id, $videoIds) || ($video->google_file_id == $file->getId())) {
+                $video = $googleDriveService->downloadFile($file);
+                SendVideoTelegramJob::dispatch($video);
+                return;
             }
         }
     }
