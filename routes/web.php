@@ -1,7 +1,9 @@
 <?php
 
-    use App\Http\Controllers\VideoController;
-    use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\VideoController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,3 +24,11 @@ Route::get('download', function () {
     return view('download');
 });
 Route::post('download', [VideoController::class, 'downloadVideo']);
+
+Route::get("register", [RegisterController::class, "index"])->name("register");
+Route::post("register", [RegisterController::class, "register"]);
+Route::get("login", [LoginController::class, "index"])->name("login");
+Route::post("login", [LoginController::class, "login"]);
+Route::get("logout", [LoginController::class, "logout"]);
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
