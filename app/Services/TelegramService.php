@@ -22,7 +22,7 @@ class TelegramService
     {
         $params = [
             'chat_id' => $this->memChatId,
-            'video' => env('APP_URL') . '/' . $video->name,
+            'video' => config("app.url") . '/' . $video->name,
             'caption' => "[Memkes](https://t.me/+eDaOkG0hXi5mNzAy)",
             "parse_mode" => "markdown"
         ];
