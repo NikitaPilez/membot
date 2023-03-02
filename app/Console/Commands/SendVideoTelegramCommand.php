@@ -22,7 +22,7 @@ class SendVideoTelegramCommand extends Command
         $video = Video::where("is_sent", 0)->first();
 
         foreach ($files as $file) {
-            if (!in_array($file->id, $videoIds) || ($video->google_file_id == $file->getId())) {
+            if (!in_array($file->id, $videoIds) || ($video?->google_file_id == $file->getId())) {
                 $video = $googleDriveService->downloadFile($file);
                 SendVideoTelegramJob::dispatch($video);
                 return;
