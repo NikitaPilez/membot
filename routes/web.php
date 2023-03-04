@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
 Route::get('download', function () {
     return view('download');
@@ -34,5 +34,3 @@ Route::post("register", [RegisterController::class, "register"]);
 Route::get("login", [LoginController::class, "index"])->name("login");
 Route::post("login", [LoginController::class, "login"]);
 Route::get("logout", [LoginController::class, "logout"]);
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
