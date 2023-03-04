@@ -23,7 +23,11 @@ Route::get('/', function () {
 Route::get('download', function () {
     return view('download');
 });
-Route::post('download', [VideoController::class, 'downloadVideo']);
+
+Route::group(['prefix' => 'download'], function () {
+    Route::post('video', [VideoController::class, 'downloadVideo']);
+    Route::post('content', [VideoController::class, 'downloadContent']);
+});
 
 Route::get("register", [RegisterController::class, "index"])->name("register");
 Route::post("register", [RegisterController::class, "register"]);

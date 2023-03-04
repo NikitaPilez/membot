@@ -7,20 +7,35 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
 </head>
 <body>
-<div class="mt-5 ms-5">
-    <form class="row g-3" action="{{ asset('download') }}" method="POST">
+<div class="mt-5 ms-2 me-2">
+    <form class="row g-3" action="{{ asset('download/video') }}" method="POST">
         @csrf
 
         <div class="col-auto">
-            <label for="text" class="visually-hidden">Email</label>
-            <input type="text" readonly class="form-control-plaintext" id="text" value="Input link">
+            <label for="text" class="visually-hidden">Label</label>
+            <input type="text" readonly class="form-control-plaintext" id="text" value="Input inst/youtube/tiktok link">
         </div>
         <div class="col-md-8">
-            <label for="link" class="visually-hidden">Password</label>
-            <input class="form-control" id="link" name="url" placeholder="Link">
+            <label for="link" class="visually-hidden">Input url</label>
+            <input class="form-control" id="link" name="url" placeholder="Inst/youtube/tiktok link">
         </div>
         <div class="col-auto">
-            <button type="submit" class="btn btn-primary mb-3">Confirm identity</button>
+            <button type="submit" class="btn btn-primary mb-3">Send url link</button>
+        </div>
+    </form>
+    <form class="row g-3 mt-5" action="{{ asset('download/content') }}" method="POST">
+        @csrf
+
+        <div class="col-auto">
+            <label for="text" class="visually-hidden">Label</label>
+            <input type="text" readonly class="form-control-plaintext" id="text" value="Content link">
+        </div>
+        <div class="col-md-8">
+            <label for="link" class="visually-hidden">Input content</label>
+            <input class="form-control" id="content" name="content_url" placeholder="Content link">
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary mb-3">Send content link</button>
         </div>
     </form>
 </div>

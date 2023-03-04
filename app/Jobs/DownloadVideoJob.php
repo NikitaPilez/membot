@@ -17,12 +17,14 @@ class DownloadVideoJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private string $url;
-    private string $type;
+    private ?string $url;
+    private ?string $type;
+    private ?string $contentUrl;
 
-    public function __construct(string $url, string $type)
+    public function __construct(?string $url = null, ?string $type = null, ?string $contentUrl = null)
     {
         $this->url = $url;
+        $this->contentUrl = $contentUrl;
         $this->type = $type;
     }
 
@@ -31,12 +33,18 @@ class DownloadVideoJob implements ShouldQueue
         $videoDownloader = match ($this->type) {
             "tiktok" => new TikTokContentVideo(),
             "youtube" => new YoutubeContentVideo(),
-            "instagram" => new InstagramContent()
+            "instagram" => new InstagramContent(),
+            default => null,
         };
 
-        $contentUrl = $videoDownloader->getContentUrl($this->url);
-        $content = $videoDownloader->getContent($contentUrl);
-        $fileName = $this->type . " " . date("Y-m-d H:i") . ".mp4";
+        if ($videoDownloader) {
+            $this->contentUrl = $videoDownloader->getContentUrl($this->url);
+            $content = $videoDownloader->getContent($this->contentUrl);
+        } else {
+            $content = file_get_contents($this->contentUrl);
+        }
+
+        $fileName = ($this->type ? $this->type . " " : "") . date("Y-m-d H:i") . ".mp4";
 
         /** @var GoogleDriveService $googleDriveService */
         $googleDriveService = app(GoogleDriveService::class);
@@ -46,7 +54,7 @@ class DownloadVideoJob implements ShouldQueue
             "google_file_id" => $driveFile->getId(),
             "name" => $fileName,
             "url" => $this->url,
-            "content_url" => $contentUrl,
+            "content_url" => $this->contentUrl,
             "type" => $this->type,
         ]);
     }

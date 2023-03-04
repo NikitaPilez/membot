@@ -24,4 +24,11 @@ class VideoController
 
         return response()->json(['data' => 'success']);
     }
+
+    public function downloadContent(Request $request): JsonResponse
+    {
+        DownloadVideoJob::dispatch(contentUrl: $request->input("content_url"));
+
+        return response()->json(['data' => 'success']);
+    }
 }
