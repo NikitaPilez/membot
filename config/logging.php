@@ -65,7 +65,7 @@ return [
 
         'content' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/content.log'),
+            'path' => storage_path('logs/content/content.log'),
         ],
 
         'daily' => [
