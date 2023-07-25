@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Helpers\Download\InstagramContent;
+use App\Helpers\Download\SimpleConverter;
 use App\Helpers\Download\TikTokContentVideo;
 use App\Helpers\Download\YoutubeContentVideo;
 use App\Models\Video;
@@ -12,50 +13,60 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class DownloadVideoJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private ?string $url;
-    private ?string $type;
-    private ?string $contentUrl;
+    private string $url;
+    private string $type;
 
-    public function __construct(?string $url = null, ?string $type = null, ?string $contentUrl = null)
+    public function __construct(string $url, string $type)
     {
         $this->url = $url;
-        $this->contentUrl = $contentUrl;
         $this->type = $type;
     }
 
-    public function handle()
+    public function handle(): void
     {
         $videoDownloader = match ($this->type) {
-            "tiktok" => new TikTokContentVideo(),
-            "youtube" => new YoutubeContentVideo(),
-            "instagram" => new InstagramContent(),
-            default => null,
+            'tiktok' => new TikTokContentVideo(),
+            'youtube' => new YoutubeContentVideo(),
+            'instagram' => new InstagramContent(),
+            default => new SimpleConverter(),
         };
 
-        if ($videoDownloader) {
-            $this->contentUrl = $videoDownloader->getContentUrl($this->url);
-            $content = $videoDownloader->getContent($this->contentUrl);
+        $contentUrlResponse = $videoDownloader->getContentUrl($this->url);
+
+        if (!$contentUrlResponse->success) {
+            Log::channel('content')->error('Ошибка при попытке получить исходный url', [
+                'videoUrl' => $this->url,
+                'message' => $contentUrlResponse->message,
+            ]);
+
+            return;
         } else {
-            $content = file_get_contents($this->contentUrl);
+            Log::channel('content')->info('Успешно получен исходный url', [
+                'videoUrl' => $this->url,
+                'contentUrl' => $contentUrlResponse->sourceUrl,
+            ]);
         }
 
-        $fileName = ($this->type ? $this->type . " " : "") . date("Y-m-d H:i") . ".mp4";
+        $content = $videoDownloader->getContent($contentUrlResponse->sourceUrl);
+
+        $fileName = $this->type . date('Y-m-d H:i') . '.mp4';
 
         /** @var GoogleDriveService $googleDriveService */
         $googleDriveService = app(GoogleDriveService::class);
         $driveFile = $googleDriveService->createFile($content, $fileName);
 
-        Video::create([
-            "google_file_id" => $driveFile->getId(),
-            "name" => $fileName,
-            "url" => $this->url,
-            "content_url" => $this->contentUrl,
-            "type" => $this->type,
+        Video::query()->create([
+            'google_file_id' => $driveFile->getId(),
+            'name' => $fileName,
+            'url' => $this->url,
+            'content_url' => $contentUrlResponse->sourceUrl,
+            'type' => $this->type,
         ]);
     }
 }

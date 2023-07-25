@@ -10,7 +10,7 @@ class VideoController
 {
     public function downloadVideo(Request $request): JsonResponse
     {
-        $url = $request->input("url");
+        $url = (string) $request->input('url');
 
         $type = collect([
             'instagram.com' => 'instagram',
@@ -27,7 +27,7 @@ class VideoController
 
     public function downloadContent(Request $request): JsonResponse
     {
-        DownloadVideoJob::dispatch(contentUrl: $request->input("content_url"));
+        DownloadVideoJob::dispatch($request->input('content_url'), 'simple');
 
         return response()->json(['data' => 'success']);
     }

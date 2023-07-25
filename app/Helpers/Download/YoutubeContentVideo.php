@@ -2,19 +2,28 @@
 
 namespace App\Helpers\Download;
 
-use Illuminate\Support\Facades\Log;
+use App\DTO\GetContentUrlDTO;
+use Exception;
 
 class YoutubeContentVideo implements ContentVideoInterface
 {
 
-    public function getContentUrl(string $videoUrl): string
+    public function getContentUrl(string $videoUrl): GetContentUrlDTO
     {
-        preg_match('/"(?=https:\/\/rr).{1,444}(?=mp4).*?"/', file_get_contents($videoUrl), $matches);
-        $sourceUrl = str_replace('\u0026', '&', str_replace('"', '', $matches[0]));
+        try {
+            preg_match('/"(?=https:\/\/rr).{1,444}(?=mp4).*?"/', file_get_contents($videoUrl), $matches);
+            $sourceUrl = str_replace('\u0026', '&', str_replace('"', '', $matches[0]));
+        } catch (Exception $exception) {
+            return new GetContentUrlDTO(
+                success: false,
+                message: $exception->getMessage(),
+            );
+        }
 
-        Log::info("Youtube video, source url " . $sourceUrl);
-
-        return $sourceUrl;
+        return new GetContentUrlDTO(
+            success: true,
+            sourceUrl: $sourceUrl,
+        );
     }
 
     public function getContent(string $sourceUrl)

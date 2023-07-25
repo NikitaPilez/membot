@@ -29,8 +29,8 @@ Route::group(['prefix' => 'download'], function () {
     Route::post('content', [VideoController::class, 'downloadContent']);
 });
 
-Route::get("register", [RegisterController::class, "index"])->name("register");
-Route::post("register", [RegisterController::class, "register"]);
-Route::get("login", [LoginController::class, "index"])->name("login");
-Route::post("login", [LoginController::class, "login"]);
-Route::get("logout", [LoginController::class, "logout"]);
+Route::get('register', [RegisterController::class, 'index'])->name('register');
+Route::post('register', [RegisterController::class, 'register']);
+Route::get('login', [LoginController::class, 'index'])->name('login');
+Route::post('login', [LoginController::class, 'login']);
+Route::get('logout', [LoginController::class, 'logout']);

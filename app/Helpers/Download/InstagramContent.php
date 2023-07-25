@@ -2,6 +2,8 @@
 
 namespace App\Helpers\Download;
 
+use App\DTO\GetContentUrlDTO;
+use Exception;
 use HeadlessChromium\BrowserFactory;
 use Illuminate\Support\Facades\Log;
 
@@ -13,19 +15,28 @@ class InstagramContent implements ContentVideoInterface
         return file_get_contents($sourceUrl);
     }
 
-    public function getContentUrl(string $videoUrl): string
+    public function getContentUrl(string $videoUrl): GetContentUrlDTO
     {
-        $browserFactory = new BrowserFactory();
-        $browser = $browserFactory->createBrowser();
+        try {
+            $browserFactory = new BrowserFactory();
+            $browser = $browserFactory->createBrowser();
 
-        $page = $browser->createPage();
-        $page->navigate($videoUrl)->waitForNavigation();
-        $html = $page->getHtml(20000);
+            $page = $browser->createPage();
+            $page->navigate($videoUrl)->waitForNavigation();
+            $html = $page->getHtml(20000);
 
-        preg_match('/"contentUrl":"(.*?)"/', $html, $match);
-        $sourceUrl = stripslashes(json_decode('"' . $match[1] . '"'));
-        Log::info("Instagram video, source url " . $sourceUrl);
+            preg_match('/"contentUrl":"(.*?)"/', $html, $match);
+            $sourceUrl = stripslashes(json_decode('"' . $match[1] . '"'));
+        } catch (Exception $exception) {
+            return new GetContentUrlDTO(
+                success: false,
+                message: $exception->getMessage(),
+            );
+        }
 
-        return $sourceUrl;
+        return new GetContentUrlDTO(
+            success: true,
+            sourceUrl: $sourceUrl,
+        );
     }
 }
