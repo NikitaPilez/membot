@@ -2,7 +2,6 @@
 
 namespace App\Exceptions;
 
-use App\Services\TelegramService;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -44,12 +43,8 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $telegramService = new TelegramService();
-
-        $this->reportable(function (Throwable $e) use ($telegramService) {
-            if (config('app.env') !== "local") {
-                $telegramService->sendErrorLog();
-            }
+        $this->reportable(function (Throwable $e) {
+            //
         });
     }
 }

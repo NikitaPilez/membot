@@ -34,19 +34,6 @@ class TelegramService
         return $response->json();
     }
 
-    public function sendErrorLog()
-    {
-        $url =  $this->apiUrl . "/sendDocument";
-        $managerIds = explode(",", config('services.telegram.manager_ids'));
-        foreach ($managerIds as $managerId) {
-            $response = Http::attach('document', fopen(storage_path("logs/laravel.log"), 'r'))->post($url, [
-                'chat_id' => $managerId,
-            ]);
-
-            Log::info($response->json());
-        }
-    }
-
     public function getChannelStats()
     {
         $proto = MTProtoSingleton::getProtoInstance();
