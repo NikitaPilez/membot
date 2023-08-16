@@ -11,23 +11,24 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 class SendVideoTelegramJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $video;
+    protected Video $video;
 
     public function __construct(Video $video)
     {
         $this->video = $video;
     }
 
-    public function handle(TelegramService $telegramService)
+    public function handle(TelegramService $telegramService): void
     {
-        $response = $telegramService->sendVideo($this->video);
+        $result = $telegramService->sendVideo($this->video);
 
-        if ($response["ok"]) {
+        if ($result === true) {
             $this->video->is_sent = 1;
             $this->video->sent_at = Carbon::now();
             $this->video->save();

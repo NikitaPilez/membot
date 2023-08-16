@@ -46,12 +46,12 @@ class DownloadVideoJob implements ShouldQueue
             ]);
 
             return;
-        } else {
-            Log::channel('content')->info('Успешно получен исходный url', [
-                'videoUrl' => $this->url,
-                'contentUrl' => $contentUrlResponse->sourceUrl,
-            ]);
         }
+
+        Log::channel('content')->info('Успешно получен исходный url', [
+            'videoUrl' => $this->url,
+            'contentUrl' => $contentUrlResponse->sourceUrl,
+        ]);
 
         $content = $videoDownloader->getContent($contentUrlResponse->sourceUrl);
 
@@ -60,6 +60,19 @@ class DownloadVideoJob implements ShouldQueue
         /** @var GoogleDriveService $googleDriveService */
         $googleDriveService = app(GoogleDriveService::class);
         $driveFile = $googleDriveService->createFile($content, $fileName);
+
+        if (!$driveFile->getId()) {
+            Log::channel('content')->error('Не найден id файла при загрузке файла на гугл диск', [
+                'sourceUrl' => $this->url,
+                'contentUrl' => $contentUrlResponse->sourceUrl,
+            ]);
+        } else {
+            Log::channel('content')->info('Файл успешно загружен на гугл диск', [
+                'fileId' => $driveFile->getId(),
+                'sourceUrl' => $this->url,
+                'contentUrl' => $contentUrlResponse->sourceUrl,
+            ]);
+        }
 
         Video::query()->create([
             'google_file_id' => $driveFile->getId(),

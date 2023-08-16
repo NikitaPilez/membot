@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console;
 
 use App\Console\Commands\GetChannelStatsCommand;
-use App\Console\Commands\SendVideoTelegramCommand;
+use App\Console\Commands\SendVideoInTelegramCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -17,7 +19,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command(SendVideoTelegramCommand::class)->everyTwoHours();
+        $schedule->command(SendVideoInTelegramCommand::class)->everyTwoHours();
 //        $schedule->command(GetChannelStatsCommand::class)->daily();
     }
 

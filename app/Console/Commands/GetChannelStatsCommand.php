@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Models\Stat;
@@ -8,15 +10,15 @@ use Illuminate\Console\Command;
 
 class GetChannelStatsCommand extends Command
 {
-    protected $signature = "channel:stats";
+    protected $signature = 'channel:stats';
 
-    public function handle(TelegramService $telegramService)
+    public function handle(TelegramService $telegramService): void
     {
         $stats = $telegramService->getChannelStats();
 
-        Stat::create([
-            "date" => date("d.m.Y"),
-            "participants_count" => $stats["full"]["participants_count"]
+        Stat::query()->create([
+            'date' => date('d.m.Y'),
+            'participants_count' => $stats['full']['participants_count']
         ]);
     }
 }

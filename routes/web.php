@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\TelegramController;
 use App\Http\Controllers\VideoController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +24,8 @@ Route::get('/', function () {
 Route::get('download', function () {
     return view('download');
 });
+
+Route::get('sendTelegram', [TelegramController::class, 'send'])->name('send.telegram');
 
 Route::group(['prefix' => 'download'], function () {
     Route::post('video', [VideoController::class, 'downloadVideo']);

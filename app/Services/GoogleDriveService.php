@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
-use App\Models\Video;
+use Exception;
 use Google\Service\Drive;
 use Google\Service\Drive\DriveFile;
 use Google_Client;
 use Google_Service_Drive;
+use Illuminate\Support\Facades\Log;
 
 class GoogleDriveService
 {
@@ -35,6 +38,15 @@ class GoogleDriveService
     }
 
     /**
+     * @param string $id
+     * @return DriveFile
+     */
+    public function getFileById(string $id): DriveFile
+    {
+        return $this->service->files->get($id);
+    }
+
+    /**
      * @param DriveFile[] $files
      * @return void
      */
@@ -47,38 +59,37 @@ class GoogleDriveService
 
     /**
      * @param DriveFile $file
-     * @return Video
      */
-    public function downloadFile(DriveFile $file): Video
+    public function downloadFile(DriveFile $file): void
     {
-        $response = $this->service->files->get($file->getId(), ['alt' => 'media']);
+        try {
+            $response = $this->service->files->get($file->getId(), ['alt' => 'media']);
 
-        file_put_contents(public_path() . '/' . $file->getName(), $response->getBody()->getContents());
+            file_put_contents(public_path() . '/' . $file->getName(), $response->getBody()->getContents());
 
-        $video = Video::where("google_file_id", $file->getId())->first();
-
-        if (!$video) {
-            $video = Video::create([
-                'name' => $file->getName(),
-                'google_file_id' => $file->getId(),
+            Log::channel('content')->info('Файл загружен на сервер.', [
+                'fileId' => $file->getId(),
+            ]);
+        } catch (Exception $exception) {
+            Log::channel('content')->error('Произошла ошибка во время загрузки файла на сервер.', [
+                'fileId' => $file->getId(),
+                'message' => $exception->getMessage(),
             ]);
         }
-
-        return $video;
     }
 
-    public function createFile(string $content, string $fileName = null): DriveFile
+    public function createFile(string $content, string $fileName): DriveFile
     {
         $fileMetadata = new DriveFile([
-            "parents" => [config("services.google.mem_video_folder_id")],
-            "name" => $fileName ?? date("Y-m-d H:i") . ".mp4"
+            'parents' => [config('services.google.mem_video_folder_id')],
+            'name' => $fileName,
         ]);
 
         return $this->service->files->create($fileMetadata, [
-            "data" => $content,
-            "mimeType" => "video/mp4",
-            "uploadType" => "multipart",
-            "fields" => "id",
+            'data' => $content,
+            'mimeType' => 'video/mp4',
+            'uploadType' => 'multipart',
+            'fields' => 'id',
         ]);
     }
 }
