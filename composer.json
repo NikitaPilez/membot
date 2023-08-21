@@ -54,7 +54,9 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
         ],
-        "post-install-cmd": ["php artisan storage:link --quiet"]
+        "post-install-cmd": [
+            "php artisan storage:link --quiet && php artisan basset:fresh"
+        ]
     },
     "extra": {
         "laravel": {
