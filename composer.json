@@ -55,7 +55,7 @@
             "@php artisan key:generate --ansi"
         ],
         "post-install-cmd": [
-            "php artisan storage:link --quiet && php artisan basset:install"
+            "php artisan storage:link --quiet"
         ]
     },
     "extra": {
