@@ -7,7 +7,7 @@ use Exception;
 use HeadlessChromium\BrowserFactory;
 use Illuminate\Support\Facades\Log;
 
-class InstagramContent implements ContentVideoInterface
+class InstagramContentVideo implements ContentVideoInterface
 {
 
     public function getContent(string $sourceUrl)

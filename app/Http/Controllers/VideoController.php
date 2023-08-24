@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Jobs\DownloadVideoJob;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class VideoController
 {
-    public function downloadVideo(Request $request): JsonResponse
+    public function downloadVideo(Request $request): RedirectResponse
     {
         $url = (string) $request->input('url');
 
@@ -24,13 +24,13 @@ class VideoController
 
         DownloadVideoJob::dispatch($url, $type);
 
-        return response()->json(['data' => 'success']);
+        return back();
     }
 
-    public function downloadContent(Request $request): JsonResponse
+    public function downloadContent(Request $request): RedirectResponse
     {
         DownloadVideoJob::dispatch($request->input('content_url'), 'simple');
 
-        return response()->json(['data' => 'success']);
+        return back();
     }
 }

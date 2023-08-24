@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Helpers\Download\InstagramContent;
+use App\Helpers\Download\InstagramContentVideo;
 use App\Helpers\Download\SimpleConverter;
 use App\Helpers\Download\TikTokContentVideo;
 use App\Helpers\Download\YoutubeContentVideo;
@@ -33,7 +33,7 @@ class DownloadVideoJob implements ShouldQueue
         $videoDownloader = match ($this->type) {
             'tiktok' => new TikTokContentVideo(),
             'youtube' => new YoutubeContentVideo(),
-            'instagram' => new InstagramContent(),
+            'instagram' => new InstagramContentVideo(),
             default => new SimpleConverter(),
         };
 

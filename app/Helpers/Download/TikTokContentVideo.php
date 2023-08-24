@@ -77,10 +77,6 @@ class TikTokContentVideo implements ContentVideoInterface
 
             $encodedUrlArr = explode('"downloadAddr":"', $content);
 
-            if (count($encodedUrlArr) < 1) {
-                // TODO Error
-            }
-
             $encodedUrl = explode("\"", $encodedUrlArr[1])[0];
             $sourceUrl = $this->escape_sequence_decode($encodedUrl);
         } catch (Exception $exception) {
