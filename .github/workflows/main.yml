@@ -1,0 +1,39 @@
+name: Deploy application
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: intl, pdo, xml, zip, gd, bcmath
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --no-suggest --no-progress
+
+      - name: Clean up
+        run: rm -rf .git* .env.example .editorconfig README.md
+
+      - name: Write SSH keys
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Deploy application
+        run: rsync -e 'ssh -o StrictHostKeyChecking=no' -av --delete --exclude ".env" --exclude "/storage" ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.SSH_SOURCE_DIR }}
+
+      - name: Execute command via ssh
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.SSH_SOURCE_DIR }} && php artisan migrate --force && php artisan basset:install && php artisan optimize && pm2 restart schedule queue"
