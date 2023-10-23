@@ -6,7 +6,6 @@ namespace App\Console\Commands;
 
 use HeadlessChromium\BrowserFactory;
 use Illuminate\Console\Command;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Exception;
 
@@ -21,20 +20,21 @@ class SendVideoFromUrlCommand extends Command
         $browserFactory = new BrowserFactory();
         $browser = $browserFactory->createBrowser([
             'customFlags' => ['--disable-blink-features=AutomationControlled'],
-//            'headless' => false
+//            'headless' => false,
+            'sendSyncDefaultTimeout' => 10000,
         ]);
 
         $page = $browser->createPage();
         $page->navigate('https://en.savefrom.net/1-youtube-video-downloader-4/')->waitForNavigation();
-
         $page->evaluate(sprintf("document.getElementsByName('sf_url')[0].value='%s'", $this->option('url')));
         $page->evaluate("document.getElementsByName('sf_submit')[0].click()");
-        sleep(4);
-        $html = $page->getHtml(10000);
 
-        preg_match('/data-type="mp4" href="(.*?)" data-ga-event/', $html, $match);
+        sleep(5);
 
-        if (!Arr::get($match, 1)) {
+        $url = $page->evaluate("document.querySelector('[download]').href")->getReturnValue();
+        $browser->close();
+
+        if (!$url) {
             return;
         }
 
@@ -44,7 +44,7 @@ class SendVideoFromUrlCommand extends Command
 
         $params = [
             'chat_id' => $this->memChatId,
-            'video' => htmlspecialchars_decode($match[1] ?? ''),
+            'video' => $url,
             'caption' => '[Memkes](https://t.me/+eDaOkG0hXi5mNzAy)',
             'parse_mode' => 'markdown'
         ];
