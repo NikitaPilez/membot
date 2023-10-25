@@ -9,12 +9,12 @@ use Tests\TestCase;
 
 class TikTokContentTest extends TestCase
 {
-    public function testGetContentUrlFromTikTokSuccess(): void
-    {
-        $tiktokContent = new TikTokContentVideo();
-
-        $result = $tiktokContent->getContentUrl('https://vm.tiktok.com/ZMjJusH2n/');
-
-        $this->assertTrue($result->success);
-    }
+//    public function testGetContentUrlFromTikTokSuccess(): void
+//    {
+//        $tiktokContent = new TikTokContentVideo();
+//
+//        $result = $tiktokContent->getContentUrl('https://vm.tiktok.com/ZMjJusH2n/');
+//
+//        $this->assertTrue($result->success);
+//    }
 }

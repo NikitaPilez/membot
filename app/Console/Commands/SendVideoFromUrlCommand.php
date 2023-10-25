@@ -20,7 +20,7 @@ class SendVideoFromUrlCommand extends Command
         $browserFactory = new BrowserFactory();
         $browser = $browserFactory->createBrowser([
             'customFlags' => ['--disable-blink-features=AutomationControlled'],
-//            'headless' => false,
+            'headless' => false,
             'sendSyncDefaultTimeout' => 10000,
         ]);
 
