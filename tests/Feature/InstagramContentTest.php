@@ -9,12 +9,12 @@ use Tests\TestCase;
 
 class InstagramContentTest extends TestCase
 {
-//    public function testGetContentUrlFromInstagramSuccess(): void
-//    {
-//        $instagramContent = new InstagramContentVideo();
-//
-//        $result = $instagramContent->getContentUrl('https://www.instagram.com/reel/CvsLZX9r_6v/?igshid=MzRlODBiNWFlZA==');
-//
-//        $this->assertTrue($result->success);
-//    }
+    public function testGetContentUrlFromInstagramSuccess(): void
+    {
+        $instagramContent = new InstagramContentVideo();
+
+        $result = $instagramContent->getContentUrl('https://www.instagram.com/p/CopX1mhp99P/');
+
+        $this->assertTrue($result->success);
+    }
 }
