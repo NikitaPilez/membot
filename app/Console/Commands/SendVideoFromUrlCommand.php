@@ -19,38 +19,34 @@ class SendVideoFromUrlCommand extends Command
     {
         $browserFactory = new BrowserFactory();
         $browser = $browserFactory->createBrowser([
-            'customFlags' => ['--disable-blink-features=AutomationControlled'],
-            'headless' => false,
+            'customFlags' => ['--disable-blink-features', '--disable-blink-features=AutomationControlled'],
             'sendSyncDefaultTimeout' => 10000,
         ]);
 
         $page = $browser->createPage();
-        $page->navigate('https://en.savefrom.net/1-youtube-video-downloader-4/')->waitForNavigation();
-        $page->evaluate(sprintf("document.getElementsByName('sf_url')[0].value='%s'", $this->option('url')));
-        $page->evaluate("document.getElementsByName('sf_submit')[0].click()");
+        $page->navigate('https://sssinstagram.com')->waitForNavigation();
+        $elem = $page->dom()->querySelector('#main_page_text');
+
+        $elem->click();
+        $elem->sendKeys($this->option('url'));
+
+        sleep(1);
+
+        $page->evaluate("document.querySelector('#submit').click()");
 
         sleep(5);
-
-        $url = $page->evaluate("document.querySelector('[download]').href")->getReturnValue();
+        $url = $page->evaluate("document.querySelector('.download-wrapper a').href")->getReturnValue();
         $browser->close();
 
-        if (!$url) {
-            return;
-        }
-
-        $telegramApiKey = config('services.telegram.api_key');
-        $this->apiUrl = 'https://api.telegram.org/' . $telegramApiKey;
-        $this->memChatId = config('services.telegram.chat_id');
-
         $params = [
-            'chat_id' => $this->memChatId,
+            'chat_id' => config('services.telegram.chat_id'),
             'video' => $url,
             'caption' => '[Memkes](https://t.me/+eDaOkG0hXi5mNzAy)',
             'parse_mode' => 'markdown'
         ];
 
         try {
-            Http::post($this->apiUrl . '/sendVideo', $params);
+            Http::post(sprintf('https://api.telegram.org/%s/sendVideo', config('services.telegram.api_key')), $params);
         } catch (Exception $exception) {
             info('SendVideoFromUrlCommand', ['message' => $exception->getMessage()]);
         }
