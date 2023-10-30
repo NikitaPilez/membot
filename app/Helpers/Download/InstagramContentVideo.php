@@ -10,7 +10,26 @@ class InstagramContentVideo implements ContentVideoInterface
 {
     public function getContent(string $sourceUrl)
     {
-        return file_get_contents($sourceUrl);
+        $ch = curl_init();
+        $videoName = 'video.mp4';
+
+        curl_setopt_array($ch, [
+            CURLOPT_URL            => $sourceUrl,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_BINARYTRANSFER => true,
+        ]);
+
+        $videoContent = curl_exec($ch);
+
+        file_put_contents($videoName, $videoContent);
+
+        curl_close($ch);
+
+        $content = file_get_contents($videoName);
+
+        unlink($videoName);
+
+        return $content;
     }
 
     public function getContentUrl(string $videoUrl): GetContentUrlDTO
