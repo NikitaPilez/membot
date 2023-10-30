@@ -2,34 +2,33 @@
 
 namespace App\Helpers\Download;
 
+use App\DTO\GetContentDTO;
 use App\DTO\GetContentUrlDTO;
 use Exception;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use HeadlessChromium\BrowserFactory;
 
 class InstagramContentVideo implements ContentVideoInterface
 {
     public function getContent(string $sourceUrl)
     {
-        $ch = curl_init();
-        $videoName = 'video.mp4';
+        $client = new Client();
 
-        curl_setopt_array($ch, [
-            CURLOPT_URL            => $sourceUrl,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_BINARYTRANSFER => true,
-        ]);
+        try {
+            $response = $client->get($sourceUrl);
+            $body = $response->getBody();
+        } catch (GuzzleException $e) {
+            return new GetContentDTO(
+                success: false,
+                message: $e->getMessage(),
+            );
+        }
 
-        $videoContent = curl_exec($ch);
-
-        file_put_contents($videoName, $videoContent);
-
-        curl_close($ch);
-
-        $content = file_get_contents($videoName);
-
-        unlink($videoName);
-
-        return $content;
+        return new GetContentDTO(
+            success: true,
+            content: $body->getContents(),
+        );
     }
 
     public function getContentUrl(string $videoUrl): GetContentUrlDTO

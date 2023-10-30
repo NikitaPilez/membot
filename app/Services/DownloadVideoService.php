@@ -36,13 +36,22 @@ class DownloadVideoService
             'contentUrl' => $contentUrlResponse->sourceUrl,
         ]);
 
-        $content = $videoDownloader->getContent($contentUrlResponse->sourceUrl);
+        $getContentDto = $videoDownloader->getContent($contentUrlResponse->sourceUrl);
+
+        if (!$getContentDto->success) {
+            Log::channel()->error('Ошибка при получении контента по урлу', [
+                'message' => $getContentDto->message,
+                'url' => $contentUrlResponse->sourceUrl,
+            ]);
+
+            return;
+        }
 
         $fileName = $type . date('Y-m-d H:i') . '.mp4';
 
         /** @var GoogleDriveService $googleDriveService */
         $googleDriveService = app(GoogleDriveService::class);
-        $driveFile = $googleDriveService->createFile($content, $fileName);
+        $driveFile = $googleDriveService->createFile($getContentDto->content, $fileName);
 
         if (!$driveFile->getId()) {
             Log::channel('content')->error('Не найден id файла при загрузке файла на гугл диск', [
