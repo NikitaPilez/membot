@@ -15,15 +15,17 @@ class DownloadVideoJob implements ShouldQueue
 
     private string $url;
     private string $type;
+    private ?string $comment;
 
-    public function __construct(string $url, string $type)
+    public function __construct(string $url, string $type, ?string $comment)
     {
         $this->url = $url;
         $this->type = $type;
+        $this->comment = $comment;
     }
 
     public function handle(DownloadVideoService $service): void
     {
-        $service->download($this->type, $this->url);
+        $service->download($this->type, $this->url, $this->comment);
     }
 }

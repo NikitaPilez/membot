@@ -22,7 +22,7 @@ class VideoController
             return str_contains($url, $key);
         });
 
-        DownloadVideoJob::dispatch($url, $type);
+        DownloadVideoJob::dispatch($url, $type, $request->input('comment'));
 
         return back();
     }

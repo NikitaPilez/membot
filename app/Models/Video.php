@@ -18,6 +18,7 @@ class Video extends Model
         'url',
         'content_url',
         'type',
-        'send_at'
+        'send_at',
+        'comment',
     ];
 }

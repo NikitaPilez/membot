@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 
 class DownloadVideoService
 {
-    public function download(string $type, string $url): void
+    public function download(string $type, string $url, ?string $comment): void
     {
         $videoDownloader = match ($type) {
             'tiktok' => new TikTokContentVideo(),
@@ -74,6 +74,7 @@ class DownloadVideoService
             'url' => $url,
             'content_url' => $contentUrlResponse->sourceUrl,
             'type' => $type,
+            'comment' => $comment,
         ]);
     }
 }
