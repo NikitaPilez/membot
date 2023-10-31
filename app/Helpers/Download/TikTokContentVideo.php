@@ -7,7 +7,7 @@ use App\DTO\GetContentUrlDTO;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Support\Facades\Http;
+use HeadlessChromium\BrowserFactory;
 
 class TikTokContentVideo implements ContentVideoInterface
 {
@@ -35,19 +35,32 @@ class TikTokContentVideo implements ContentVideoInterface
     public function getContentUrl(string $videoUrl): GetContentUrlDTO
     {
         try {
-            $result = Http::asMultipart()->post('https://ssstik.io/abc?url=dl', [
-                'id' => $videoUrl,
-                'locale' => 'en',
-                'tt' => 'bk5XWDhl'
+            $browserFactory = new BrowserFactory();
+            $browser = $browserFactory->createBrowser([
+                'customFlags' => ['--disable-blink-features', '--disable-blink-features=AutomationControlled'],
+                'sendSyncDefaultTimeout' => 10000,
             ]);
 
-            $regex = '/<a[^>]*href="([^"]*)"[^>]*>Without watermark<\/a>/';
+            $page = $browser->createPage();
+            $page->navigate('https://downtik.io/')->waitForNavigation();
+            $elem = $page->dom()->querySelector('#url');
 
-            preg_match($regex, $result->body(), $matches);
+            $elem->click();
+            $elem->sendKeys($videoUrl);
+
+            sleep(1);
+
+            $page->evaluate("document.querySelector('#send').click()");
+
+            sleep(5);
+
+            $sourceUrl = $page->evaluate("document.querySelector('.abuttons a').href")->getReturnValue();
+
+            $browser->close();
 
             return new GetContentUrlDTO(
                 success: true,
-                sourceUrl: $matches[1],
+                sourceUrl: $sourceUrl,
             );
         } catch (Exception $exception) {
             return new GetContentUrlDTO(
