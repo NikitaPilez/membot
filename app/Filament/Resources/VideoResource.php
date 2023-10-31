@@ -3,15 +3,12 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VideoResource\Pages;
-use App\Filament\Resources\VideoResource\RelationManagers;
 use App\Models\Video;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class VideoResource extends Resource
 {
@@ -67,5 +64,11 @@ class VideoResource extends Resource
             'create' => Pages\CreateVideo::route('/create'),
             'edit' => Pages\EditVideo::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->orderBy('created_at', 'desc');
     }
 }
