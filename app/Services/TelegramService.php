@@ -48,10 +48,4 @@ class TelegramService
 
         return false;
     }
-
-    public function getChannelStats()
-    {
-        $proto = MTProtoSingleton::getProtoInstance();
-        return $proto->getFullInfo($this->memChatId);
-    }
 }

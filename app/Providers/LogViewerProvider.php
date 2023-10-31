@@ -22,7 +22,7 @@ class LogViewerProvider extends ServiceProvider
     public function boot(): void
     {
         LogViewer::auth(function ($request) {
-            return $request->user()->is_admin;
+            return $request->user()?->is_admin;
         });
     }
 }
