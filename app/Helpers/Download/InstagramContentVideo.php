@@ -56,16 +56,16 @@ class InstagramContentVideo implements ContentVideoInterface
             $sourceUrl = $page->evaluate("document.querySelector('.download-wrapper a').href")->getReturnValue();
 
             $browser->close();
+
+            return new GetContentUrlDTO(
+                success: true,
+                sourceUrl: $sourceUrl,
+            );
         } catch (Exception $exception) {
             return new GetContentUrlDTO(
                 success: false,
                 message: $exception->getMessage(),
             );
         }
-
-        return new GetContentUrlDTO(
-            success: true,
-            sourceUrl: $sourceUrl,
-        );
     }
 }
