@@ -20,5 +20,6 @@ class Video extends Model
         'type',
         'send_at',
         'comment',
+        'publication_date',
     ];
 }
