@@ -17,7 +17,7 @@ class TelegramController extends Controller
         $this->sendVideoInTelegramService = $sendVideoInTelegramService;
     }
 
-    public function send(?Video $video): RedirectResponse
+    public function send(Video $video): RedirectResponse
     {
         $this->sendVideoInTelegramService->sendVideoInTelegram($video);
 

@@ -18,16 +18,8 @@ class SendVideoInTelegramService
         $this->googleDriveService = $googleDriveService;
     }
 
-    public function sendVideoInTelegram(?Video $video): void
+    public function sendVideoInTelegram(Video $video): void
     {
-        $video = $this->getVideoForSend($video);
-
-        if (!$video) {
-            Log::channel('content')->info('В данный момент нет видео для отправки.');
-
-            return;
-        }
-
         try {
             $fileFromDrive = $this->googleDriveService->getFileById($video->google_file_id);
 
@@ -40,14 +32,5 @@ class SendVideoInTelegramService
                 'videoId' => $video->id,
             ]);
         }
-    }
-
-    public function getVideoForSend(?Video $video): ?Video
-    {
-        if (!$video) {
-            return Video::where('google_file_id', '!=', null)->where('is_sent', 0)->first();
-        }
-
-        return $video;
     }
 }

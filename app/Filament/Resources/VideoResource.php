@@ -54,8 +54,12 @@ class VideoResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\Action::make('send')
+                    ->url(fn (Video $video) => route('send.telegram', ['video' => $video]))
+                    ->icon('heroicon-m-inbox-arrow-down')
+                    ->visible(fn (Video $video) => !$video->is_sent),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('send')->url(fn (Video $video) => route('send.telegram', ['video' => $video]))->icon('heroicon-m-inbox-arrow-down'),
+
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
             ]);

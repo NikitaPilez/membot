@@ -25,7 +25,7 @@ Route::get('download', function () {
     return view('download');
 });
 
-Route::get('sendTelegram/{video?}', [TelegramController::class, 'send'])->name('send.telegram');
+Route::get('sendTelegram/{video}', [TelegramController::class, 'send'])->name('send.telegram');
 
 Route::group(['prefix' => 'download'], function () {
     Route::post('video', [VideoController::class, 'downloadVideo']);
