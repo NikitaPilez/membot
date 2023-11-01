@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\Video;
 use App\Services\SendVideoInTelegramService;
 use Illuminate\Http\RedirectResponse;
 
@@ -16,9 +17,9 @@ class TelegramController extends Controller
         $this->sendVideoInTelegramService = $sendVideoInTelegramService;
     }
 
-    public function send(): RedirectResponse
+    public function send(?Video $video): RedirectResponse
     {
-        $this->sendVideoInTelegramService->sendVideoInTelegram();
+        $this->sendVideoInTelegramService->sendVideoInTelegram($video);
 
         return back();
     }

@@ -18,40 +18,36 @@ class SendVideoInTelegramService
         $this->googleDriveService = $googleDriveService;
     }
 
-    public function sendVideoInTelegram(): void
+    public function sendVideoInTelegram(?Video $video): void
     {
-        $videosIds = Video::query()
-            ->where('google_file_id', '!=', null)
-            ->where('is_sent', 0)
-            ->pluck('google_file_id')->toArray();
+        $video = $this->getVideoForSend($video);
 
-        if (!$videosIds) {
+        if (!$video) {
             Log::channel('content')->info('В данный момент нет видео для отправки.');
 
             return;
         }
 
-        foreach ($videosIds as $videoId) {
-            try {
-                $fileFromDrive = $this->googleDriveService->getFileById($videoId);
+        try {
+            $fileFromDrive = $this->googleDriveService->getFileById($video->google_file_id);
 
-                Log::channel('content')->info('Найдено видео для отправки.', [
-                    'fileId' => $videoId,
-                ]);
+            $this->googleDriveService->downloadFile($fileFromDrive);
 
-                $video = Video::query()->where('google_file_id', $videoId)->first();
-
-                $this->googleDriveService->downloadFile($fileFromDrive);
-
-                SendVideoTelegramJob::dispatch($video);
-
-                return;
-            } catch (Exception $exception) {
-                Log::channel('content')->info('Ошибка при получении информации о файле.', [
-                    'message' => $exception->getMessage(),
-                    'fileId' => $videoId,
-                ]);
-            }
+            SendVideoTelegramJob::dispatch($video);
+        } catch (Exception $exception) {
+            Log::channel('content')->info('Ошибка при получении информации о файле.', [
+                'message' => $exception->getMessage(),
+                'videoId' => $video->id,
+            ]);
         }
+    }
+
+    public function getVideoForSend(?Video $video): ?Video
+    {
+        if (!$video) {
+            return Video::where('google_file_id', '!=', null)->where('is_sent', 0)->first();
+        }
+
+        return $video;
     }
 }

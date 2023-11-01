@@ -8,6 +8,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -54,11 +55,9 @@ class VideoResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-            ])
+                Tables\Actions\Action::make('send')->url(fn (Video $video) => route('send.telegram', ['video' => $video]))->icon('heroicon-m-inbox-arrow-down'),
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
             ]);
     }
 
