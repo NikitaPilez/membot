@@ -21,15 +21,16 @@ class VideoResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('comment')->label('Комментарий'),
                 Forms\Components\TextInput::make('name')->label('Имя на гугл диске')->disabled(),
+                Forms\Components\TextInput::make('comment')->label('Комментарий'),
                 Forms\Components\TextInput::make('google_file_id')->label('ID на гугл диске')->disabled(),
                 Forms\Components\TextInput::make('url')->label('Урл видео')->disabled(),
                 Forms\Components\TextInput::make('content_url')->label('Урл исходного видео')->disabled(),
                 Forms\Components\TextInput::make('type')->label('Соц. сеть')->disabled(),
-                Forms\Components\Toggle::make('is_sent')->label('Отправлено в телеграм?')->disabled(),
                 Forms\Components\DateTimePicker::make('sent_at')->label('Когда отправлено?')->disabled(),
-                Forms\Components\DateTimePicker::make('publication_date')->label('Время отправки'),
+                Forms\Components\DateTimePicker::make('publication_date')->label('Время отправки')->minDate(now()->addMinutes(2)),
+                Forms\Components\Toggle::make('is_sent')->label('Отправлено в телеграм?')->disabled(),
+//                Forms\Components\FileUpload::make('preview_image_path')->image()->disk('public')->disabled(),
             ]);
     }
 
@@ -40,9 +41,10 @@ class VideoResource extends Resource
                 Tables\Columns\TextColumn::make('comment')->toggleable(),
                 Tables\Columns\TextColumn::make('publication_date')->dateTime('d.m.Y H:i')->label('Время отправки'),
                 Tables\Columns\TextColumn::make('sent_at')->dateTime('d.m.Y H:i')->label('Отправлено в'),
+                Tables\Columns\ToggleColumn::make('is_sent')->disabled()->label('Отправлено?')->toggleable(),
+                Tables\Columns\ImageColumn::make('preview_image_path')->label('Превью изображение')->toggleable()->square()->size(75),
                 Tables\Columns\TextColumn::make('name')->toggleable(),
                 Tables\Columns\TextColumn::make('google_file_id')->limit(30)->toggleable(),
-                Tables\Columns\ToggleColumn::make('is_sent')->disabled()->label('Отправлено?')->toggleable(),
                 Tables\Columns\TextColumn::make('url')->limit(30)->toggleable(),
                 Tables\Columns\TextColumn::make('content_url')->limit(30)->toggleable(),
                 Tables\Columns\TextColumn::make('type')->label('Соц. сеть'),

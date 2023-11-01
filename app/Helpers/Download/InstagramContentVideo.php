@@ -54,12 +54,14 @@ class InstagramContentVideo implements ContentVideoInterface
             sleep(5);
 
             $sourceUrl = $page->evaluate("document.querySelector('.download-wrapper a').href")->getReturnValue();
+            $previewImgUrl = $page->evaluate("document.querySelector('.preview').src")->getReturnValue();
 
             $browser->close();
 
             return new GetContentUrlDTO(
                 success: true,
                 sourceUrl: $sourceUrl,
+                previewImgUrl: $previewImgUrl,
             );
         } catch (Exception $exception) {
             return new GetContentUrlDTO(

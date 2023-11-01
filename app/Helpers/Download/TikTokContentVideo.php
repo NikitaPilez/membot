@@ -55,12 +55,14 @@ class TikTokContentVideo implements ContentVideoInterface
             sleep(5);
 
             $sourceUrl = $page->evaluate("document.querySelector('.abuttons a').href")->getReturnValue();
+            $previewImgUrl = $page->evaluate("document.querySelector('.download-downtik-left img').src")->getReturnValue();
 
             $browser->close();
 
             return new GetContentUrlDTO(
                 success: true,
                 sourceUrl: $sourceUrl,
+                previewImgUrl: $previewImgUrl,
             );
         } catch (Exception $exception) {
             return new GetContentUrlDTO(

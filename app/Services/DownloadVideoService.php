@@ -6,6 +6,7 @@ use App\Helpers\Download\ContentVideoInterface;
 use App\Helpers\Utils;
 use App\Models\Video;
 use Illuminate\Support\Facades\Log;
+use Intervention\Image\Facades\Image;
 
 class DownloadVideoService
 {
@@ -62,6 +63,10 @@ class DownloadVideoService
             'contentUrl' => $contentUrlResponse->sourceUrl,
         ]);
 
+        if ($contentUrlResponse->previewImgUrl) {
+            $previewImagePath = $this->downloadPreviewImage($contentUrlResponse->previewImgUrl);
+        }
+
         Video::query()->create([
             'google_file_id' => $driveFile->getId(),
             'name' => $fileName,
@@ -69,6 +74,18 @@ class DownloadVideoService
             'content_url' => $contentUrlResponse->sourceUrl,
             'type' => $type,
             'comment' => $comment,
+            'preview_image_path' => $previewImagePath ?? null,
         ]);
+    }
+
+    public function downloadPreviewImage(string $previewImgUrl): string
+    {
+        $image = Image::make($previewImgUrl);
+        $image->encode('webp', 75);
+        $fileName =  date('Y-m-d H:i') . '.webp';
+        $savePath = storage_path('app/public/' . $fileName);
+        $image->save($savePath);
+
+        return $fileName;
     }
 }
