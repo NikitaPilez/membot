@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Utils;
 use App\Jobs\DownloadVideoJob;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,15 +15,7 @@ class VideoController
     {
         $url = (string) $request->input('url');
 
-        $type = collect([
-            'instagram.com' => 'instagram',
-            'youtube.com/shorts' => 'youtube',
-            'tiktok.com' => 'tiktok',
-        ])->firstWhere(function ($value, $key) use ($url) {
-            return str_contains($url, $key);
-        });
-
-        DownloadVideoJob::dispatch($url, $type, $request->input('comment'));
+        DownloadVideoJob::dispatch($url, Utils::getSocialTypeByLink($url), $request->input('comment'));
 
         return back();
     }

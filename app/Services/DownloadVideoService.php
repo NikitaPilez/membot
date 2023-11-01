@@ -2,10 +2,8 @@
 
 namespace App\Services;
 
-use App\Helpers\Download\InstagramContentVideo;
-use App\Helpers\Download\SimpleConverter;
-use App\Helpers\Download\TikTokContentVideo;
-use App\Helpers\Download\YoutubeContentVideo;
+use App\Helpers\Download\ContentVideoInterface;
+use App\Helpers\Utils;
 use App\Models\Video;
 use Illuminate\Support\Facades\Log;
 
@@ -13,12 +11,8 @@ class DownloadVideoService
 {
     public function download(string $type, string $url, ?string $comment): void
     {
-        $videoDownloader = match ($type) {
-            'tiktok' => new TikTokContentVideo(),
-            'youtube' => new YoutubeContentVideo(),
-            'instagram' => new InstagramContentVideo(),
-            default => new SimpleConverter(),
-        };
+        /** @var ContentVideoInterface $videoDownloader */
+        $videoDownloader = Utils::getVideoContentHelper($type);
 
         $contentUrlResponse = $videoDownloader->getContentUrl($url);
 
