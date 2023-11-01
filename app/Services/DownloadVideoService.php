@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Helpers\Download\ContentVideoInterface;
 use App\Helpers\Utils;
 use App\Models\Video;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Intervention\Image\Facades\Image;
 
@@ -67,6 +68,8 @@ class DownloadVideoService
             $previewImagePath = $this->downloadPreviewImage($contentUrlResponse->previewImgUrl);
         }
 
+        $lastVideo = Video::where('is_sent', 0)->where('google_file_id', '!=', null)->where('publication_date', '>', now())->orderByDesc('publication_date')->first();
+
         Video::query()->create([
             'google_file_id' => $driveFile->getId(),
             'name' => $fileName,
@@ -75,6 +78,7 @@ class DownloadVideoService
             'type' => $type,
             'comment' => $comment,
             'preview_image_path' => $previewImagePath ?? null,
+            'publication_date' => $lastVideo ? Carbon::parse($lastVideo->publication_date)->addHours(2) : now()->addHours(2),
         ]);
     }
 
