@@ -51,7 +51,11 @@ class VideoResource extends Resource
                 Tables\Columns\TextColumn::make('type')->label('Соц. сеть'),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('is_sent')->label('Статус')
+                    ->options([
+                        '1' => 'Отправлено',
+                        '0' => 'Не отправлено',
+                    ]),
             ])
             ->actions([
                 Tables\Actions\Action::make('send')
