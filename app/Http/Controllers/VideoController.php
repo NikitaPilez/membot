@@ -15,8 +15,10 @@ class VideoController
     {
         $url = (string) $request->input('url');
         $isProd = (boolean) $request->input('is_prod');
+        $description = (string) $request->input('description');
+        $comment = (string) $request->input('comment');
 
-        DownloadVideoJob::dispatch($url, Utils::getSocialTypeByLink($url), $isProd, $request->input('comment'));
+        DownloadVideoJob::dispatch($url, Utils::getSocialTypeByLink($url), $isProd, $description, $comment);
 
         return back();
     }

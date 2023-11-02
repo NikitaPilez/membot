@@ -32,7 +32,7 @@ class VideoResource extends Resource
                 Forms\Components\DateTimePicker::make('publication_date')->label('Время отправки')->minDate(now()->addMinutes(2)->timezone('Europe/Minsk')),
                 Forms\Components\Toggle::make('is_sent')->label('Отправлено в телеграм?')->disabled(),
                 Forms\Components\Checkbox::make('is_prod')->label('Прод видео?'),
-//                Forms\Components\FileUpload::make('preview_image_path')->image()->disk('public')->disabled(),
+                Forms\Components\FileUpload::make('preview_image_path')->image()->disk('public')->disabled(),
             ]);
     }
 
@@ -40,16 +40,16 @@ class VideoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('comment')->toggleable(),
+                Tables\Columns\TextColumn::make('comment')->toggleable()->searchable(),
                 Tables\Columns\TextColumn::make('publication_date')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Время отправки'),
                 Tables\Columns\TextColumn::make('sent_at')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Отправлено в'),
                 Tables\Columns\ToggleColumn::make('is_sent')->disabled()->label('Отправлено?')->toggleable(),
                 Tables\Columns\CheckboxColumn::make('is_prod')->label('Прод?')->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Создано в')->toggleable(),
                 Tables\Columns\ImageColumn::make('preview_image_path')->label('Превью изображение')->toggleable()->square()->size(75),
+                Tables\Columns\TextColumn::make('url')->limit(30)->toggleable()->label('Урл')->searchable(),
                 Tables\Columns\TextColumn::make('name')->toggleable()->label('Имя в гугл диске'),
                 Tables\Columns\TextColumn::make('google_file_id')->limit(30)->toggleable(),
-                Tables\Columns\TextColumn::make('url')->limit(30)->toggleable()->label('Урл'),
                 Tables\Columns\TextColumn::make('content_url')->limit(30)->toggleable()->label('Исходный урл'),
                 Tables\Columns\TextColumn::make('type')->label('Соц. сеть')->toggleable(),
             ])
@@ -69,7 +69,8 @@ class VideoResource extends Resource
 
             ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
-            ]);
+            ])
+            ->defaultSort('publication_date', 'desc');
     }
 
     public static function getRelations(): array
@@ -86,11 +87,5 @@ class VideoResource extends Resource
             'create' => Pages\CreateVideo::route('/create'),
             'edit' => Pages\EditVideo::route('/{record}/edit'),
         ];
-    }
-
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()
-            ->orderBy('created_at', 'desc');
     }
 }

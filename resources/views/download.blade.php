@@ -15,6 +15,10 @@
             <input type="text" class="form-control" id="url" name="url">
         </div>
         <div class="form-group">
+            <label for="comment">Описание</label>
+            <textarea class="form-control" id="description" name="description" rows="4"></textarea>
+        </div>
+        <div class="form-group">
             <label for="comment">Комментарий</label>
             <textarea class="form-control" id="comment" name="comment" rows="4"></textarea>
         </div>
