@@ -19,7 +19,7 @@ class SendVideoInTelegramCommand extends Command
     {
         $video = Video::where('google_file_id', '!=', null)
             ->where('is_sent', 0)
-            ->where('publication_date', '>', now())
+            ->where('publication_date', '<', now())
             ->orderBy('publication_date')
             ->first();
 
