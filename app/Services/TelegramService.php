@@ -27,7 +27,7 @@ class TelegramService
             return true;
         }
 
-        $description = $video->description ? "$video->description \n\n [Memkes](https://t.me/+eDaOkG0hXi5mNzAy)" : '[Memkes](https://t.me/+eDaOkG0hXi5mNzAy)';
+        $description = $video->description ? "$video->description \n\n[Memkes](https://t.me/+eDaOkG0hXi5mNzAy)" : '[Memkes](https://t.me/+eDaOkG0hXi5mNzAy)';
 
         $params = [
             'chat_id' => $video->is_prod ? config('services.telegram.chat_id_prod') : config('services.telegram.chat_id_dev'),

@@ -24,7 +24,7 @@ class VideoResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')->label('Имя на гугл диске')->disabled(),
                 Forms\Components\TextInput::make('comment')->label('Комментарий'),
-                Forms\Components\TextInput::make('description')->label('Описание'),
+                Forms\Components\TextInput::make('description')->label('Описание для видео'),
                 Forms\Components\TextInput::make('google_file_id')->label('ID на гугл диске')->disabled(),
                 Forms\Components\TextInput::make('url')->label('Урл видео')->disabled(),
                 Forms\Components\TextInput::make('content_url')->label('Урл исходного видео')->disabled(),
@@ -41,13 +41,13 @@ class VideoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('comment')->toggleable()->searchable(),
+                Tables\Columns\TextColumn::make('comment')->toggleable()->searchable()->label('Комментарий'),
                 Tables\Columns\TextColumn::make('publication_date')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Время отправки'),
                 Tables\Columns\TextColumn::make('sent_at')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Отправлено в'),
                 Tables\Columns\ToggleColumn::make('is_sent')->disabled()->label('Отправлено?')->toggleable(),
                 Tables\Columns\CheckboxColumn::make('is_prod')->label('Прод?')->toggleable(),
                 Tables\Columns\ImageColumn::make('preview_image_path')->label('Превью изображение')->toggleable()->square()->size(75),
-                Tables\Columns\TextColumn::make('description')->label('Описание')->toggleable(),
+                Tables\Columns\TextColumn::make('description')->label('Описание к видео')->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Создано в')->toggleable(),
                 Tables\Columns\TextColumn::make('url')->limit(30)->toggleable()->label('Урл')->searchable(),
                 Tables\Columns\TextColumn::make('name')->toggleable()->label('Имя в гугл диске'),
