@@ -22,5 +22,6 @@ class Video extends Model
         'comment',
         'publication_date',
         'preview_image_path',
+        'is_prod',
     ];
 }

@@ -29,8 +29,9 @@ class VideoResource extends Resource
                 Forms\Components\TextInput::make('content_url')->label('Урл исходного видео')->disabled(),
                 Forms\Components\TextInput::make('type')->label('Соц. сеть')->disabled(),
                 Forms\Components\DateTimePicker::make('sent_at')->label('Когда отправлено?')->disabled(),
-                Forms\Components\DateTimePicker::make('publication_date')->label('Время отправки')->minDate(now()->addMinutes(2)),
+                Forms\Components\DateTimePicker::make('publication_date')->label('Время отправки')->minDate(now()->addMinutes(2)->timezone('Europe/Minsk')),
                 Forms\Components\Toggle::make('is_sent')->label('Отправлено в телеграм?')->disabled(),
+                Forms\Components\Checkbox::make('is_prod')->label('Прод видео?'),
 //                Forms\Components\FileUpload::make('preview_image_path')->image()->disk('public')->disabled(),
             ]);
     }
@@ -43,13 +44,14 @@ class VideoResource extends Resource
                 Tables\Columns\TextColumn::make('publication_date')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Время отправки'),
                 Tables\Columns\TextColumn::make('sent_at')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Отправлено в'),
                 Tables\Columns\ToggleColumn::make('is_sent')->disabled()->label('Отправлено?')->toggleable(),
-                Tables\Columns\ImageColumn::make('preview_image_path')->label('Превью изображение')->toggleable()->square()->size(75),
-                Tables\Columns\TextColumn::make('name')->toggleable(),
-                Tables\Columns\TextColumn::make('google_file_id')->limit(30)->toggleable(),
-                Tables\Columns\TextColumn::make('url')->limit(30)->toggleable(),
-                Tables\Columns\TextColumn::make('content_url')->limit(30)->toggleable(),
-                Tables\Columns\TextColumn::make('type')->label('Соц. сеть'),
+                Tables\Columns\CheckboxColumn::make('is_prod')->label('Прод?')->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Создано в')->toggleable(),
+                Tables\Columns\ImageColumn::make('preview_image_path')->label('Превью изображение')->toggleable()->square()->size(75),
+                Tables\Columns\TextColumn::make('name')->toggleable()->label('Имя в гугл диске'),
+                Tables\Columns\TextColumn::make('google_file_id')->limit(30)->toggleable(),
+                Tables\Columns\TextColumn::make('url')->limit(30)->toggleable()->label('Урл'),
+                Tables\Columns\TextColumn::make('content_url')->limit(30)->toggleable()->label('Исходный урл'),
+                Tables\Columns\TextColumn::make('type')->label('Соц. сеть')->toggleable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('is_sent')->label('Статус')

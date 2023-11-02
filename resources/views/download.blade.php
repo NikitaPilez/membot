@@ -18,6 +18,10 @@
             <label for="comment">Комментарий</label>
             <textarea class="form-control" id="comment" name="comment" rows="4"></textarea>
         </div>
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="is_prod" name="is_prod">
+            <label class="form-check-label" for="promo">Прод?</label>
+        </div>
         <button type="submit" class="btn btn-primary mt-3">Отправить</button>
     </form>
     <form class="mt-5" action="{{ url('download/content') }}" method="POST">
@@ -25,6 +29,10 @@
         <div class="col-md-8">
             <label for="link">Ссылка на контент</label>
             <input type="text" class="form-control" id="url" name="url">
+        </div>
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="is_prod" name="is_prod">
+            <label class="form-check-label" for="promo">Прод?</label>
         </div>
         <button type="submit" class="btn btn-primary mt-3">Отправить</button>
     </form>

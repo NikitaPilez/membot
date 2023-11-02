@@ -11,7 +11,7 @@ use Intervention\Image\Facades\Image;
 
 class DownloadVideoService
 {
-    public function download(string $type, string $url, ?string $comment): void
+    public function download(string $type, string $url, bool $isProd, ?string $comment): void
     {
         /** @var ContentVideoInterface $videoDownloader */
         $videoDownloader = Utils::getVideoContentHelper($type);
@@ -79,6 +79,7 @@ class DownloadVideoService
             'comment' => $comment,
             'preview_image_path' => $previewImagePath ?? null,
             'publication_date' => $lastVideo ? Carbon::parse($lastVideo->publication_date)->addHours(2) : now()->addHours(2),
+            'is_prod' => $isProd,
         ]);
     }
 

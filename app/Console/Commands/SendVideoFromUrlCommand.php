@@ -30,7 +30,7 @@ class SendVideoFromUrlCommand extends Command
         $getContentDto = $contentVideo->getContentUrl($url);
 
         $params = [
-            'chat_id' => config('services.telegram.chat_id'),
+            'chat_id' => config('services.telegram.chat_id_dev'),
             'video' => $getContentDto->sourceUrl,
             'caption' => '[Memkes](https://t.me/+eDaOkG0hXi5mNzAy)',
             'parse_mode' => 'markdown'

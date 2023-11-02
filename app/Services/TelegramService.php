@@ -10,14 +10,12 @@ use Illuminate\Support\Facades\Log;
 
 class TelegramService
 {
-    private string $memChatId;
     private string $apiUrl;
 
     public function __construct()
     {
         $telegramApiKey = config('services.telegram.api_key');
         $this->apiUrl = 'https://api.telegram.org/' . $telegramApiKey;
-        $this->memChatId = config('services.telegram.chat_id');
     }
 
     public function sendVideo(Video $video): bool
@@ -30,7 +28,7 @@ class TelegramService
         }
 
         $params = [
-            'chat_id' => $this->memChatId,
+            'chat_id' => $video->is_prod ? config('services.telegram.chat_id_prod') : config('services.telegram.chat_id_dev'),
             'video' => config('app.url') . '/' . $video->name,
             'caption' => '[Memkes](https://t.me/+eDaOkG0hXi5mNzAy)',
             'parse_mode' => 'markdown'
