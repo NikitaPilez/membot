@@ -8,6 +8,6 @@ composer i --no-dev --optimize-autoloader && \
 rm -rf .env.example .gitattributes composer.lock .git* README.md && \
 echo "Deploying..." && \
 rsync -av --delete --exclude ".env" --exclude "/storage" ./ user@142.93.102.201:membot/ && \
-ssh user@142.93.102.201 "cd membot && php artisan migrate --force && php artisan optimize && pm2 restart schedule queue" && \
+ssh user@142.93.102.201 "cd membot && php artisan migrate --force && php artisan optimize && pm2 restart schedule queue && php artisan storage:link" && \
 echo "Done in ${SECONDS} sec."
 
