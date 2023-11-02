@@ -31,6 +31,7 @@ class SendVideoTelegramJob implements ShouldQueue
         if ($result === true) {
             $this->video->is_sent = 1;
             $this->video->sent_at = Carbon::now();
+            $this->video->publication_date = Carbon::now();
             $this->video->save();
 
             File::delete(public_path($this->video->name));

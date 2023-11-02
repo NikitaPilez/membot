@@ -40,8 +40,8 @@ class VideoResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('comment')->toggleable(),
-                Tables\Columns\TextColumn::make('publication_date')->dateTime('d.m.Y H:i')->label('Время отправки'),
-                Tables\Columns\TextColumn::make('sent_at')->dateTime('d.m.Y H:i')->label('Отправлено в'),
+                Tables\Columns\TextColumn::make('publication_date')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Время отправки'),
+                Tables\Columns\TextColumn::make('sent_at')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Отправлено в'),
                 Tables\Columns\ToggleColumn::make('is_sent')->disabled()->label('Отправлено?')->toggleable(),
                 Tables\Columns\ImageColumn::make('preview_image_path')->label('Превью изображение')->toggleable()->square()->size(75),
                 Tables\Columns\TextColumn::make('name')->toggleable(),
@@ -49,6 +49,7 @@ class VideoResource extends Resource
                 Tables\Columns\TextColumn::make('url')->limit(30)->toggleable(),
                 Tables\Columns\TextColumn::make('content_url')->limit(30)->toggleable(),
                 Tables\Columns\TextColumn::make('type')->label('Соц. сеть'),
+                Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Создано в')->toggleable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('is_sent')->label('Статус')
