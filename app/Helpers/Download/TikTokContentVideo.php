@@ -8,6 +8,7 @@ use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use HeadlessChromium\BrowserFactory;
+use Illuminate\Support\Str;
 
 class TikTokContentVideo implements ContentVideoInterface
 {
@@ -46,7 +47,7 @@ class TikTokContentVideo implements ContentVideoInterface
             $elem = $page->dom()->querySelector('#url');
 
             $elem->click();
-            $elem->sendKeys($videoUrl);
+            $elem->sendKeys(Str::finish($videoUrl, '/'));
 
             sleep(1);
 
