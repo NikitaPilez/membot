@@ -30,7 +30,7 @@ class VideoResource extends Resource
                 Forms\Components\TextInput::make('content_url')->label('Урл исходного видео')->disabled(),
                 Forms\Components\TextInput::make('type')->label('Соц. сеть')->disabled(),
                 Forms\Components\DateTimePicker::make('sent_at')->label('Когда отправлено?')->disabled(),
-                Forms\Components\DateTimePicker::make('publication_date')->label('Время отправки')->minDate(now()->addMinutes(2)->timezone('Europe/Minsk')),
+                Forms\Components\DateTimePicker::make('publication_date')->label('Время отправки'),
                 Forms\Components\FileUpload::make('preview_image_path')->image()->disk('public')->disabled(),
                 Forms\Components\Toggle::make('is_sent')->label('Отправлено в телеграм?')->disabled(),
                 Forms\Components\Checkbox::make('is_prod')->label('Прод видео?'),
