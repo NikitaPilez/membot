@@ -8,6 +8,7 @@ use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use HeadlessChromium\BrowserFactory;
+use Illuminate\Support\Str;
 
 class InstagramContentVideo implements ContentVideoInterface
 {
@@ -45,7 +46,7 @@ class InstagramContentVideo implements ContentVideoInterface
             $elem = $page->dom()->querySelector('#main_page_text');
 
             $elem->click();
-            $elem->sendKeys($videoUrl);
+            $elem->sendKeys(Str::finish($videoUrl, '/'));
 
             sleep(1);
 

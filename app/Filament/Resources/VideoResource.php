@@ -33,7 +33,7 @@ class VideoResource extends Resource
                 Forms\Components\DateTimePicker::make('publication_date')->label('Время отправки'),
                 Forms\Components\FileUpload::make('preview_image_path')->image()->disk('public')->disabled(),
                 Forms\Components\Toggle::make('is_sent')->label('Отправлено в телеграм?')->disabled(),
-                Forms\Components\Checkbox::make('is_prod')->label('Прод видео?'),
+                Forms\Components\Checkbox::make('is_prod')->label('Прод видео?')->disabled(fn (Video $video) => $video->is_sent),
             ]);
     }
 
@@ -45,7 +45,7 @@ class VideoResource extends Resource
                 Tables\Columns\TextColumn::make('publication_date')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Время отправки'),
                 Tables\Columns\TextColumn::make('sent_at')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Отправлено в'),
                 Tables\Columns\ToggleColumn::make('is_sent')->disabled()->label('Отправлено?')->toggleable(),
-                Tables\Columns\CheckboxColumn::make('is_prod')->label('Прод?')->toggleable(),
+                Tables\Columns\CheckboxColumn::make('is_prod')->label('Прод?')->toggleable()->disabled(fn (Video $video) => $video->is_sent),
                 Tables\Columns\ImageColumn::make('preview_image_path')->label('Превью изображение')->toggleable()->square()->size(75),
                 Tables\Columns\TextColumn::make('description')->label('Описание к видео')->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Создано в')->toggleable(),
