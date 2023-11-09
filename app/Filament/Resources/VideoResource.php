@@ -68,6 +68,18 @@ class VideoResource extends Resource
                         '1' => 'Отправлено',
                         '0' => 'Не отправлено',
                     ]),
+                Tables\Filters\Filter::make('publication_date')
+                    ->indicateUsing(fn (array $data) => 'Дата отправки ' . $data['publication_date'])
+                ->form([
+                    Forms\Components\DatePicker::make('publication_date')
+                        ->label('Дата отправки')
+                ])
+                ->query(function (Builder $query, array $data): Builder {
+                    if ($data['publication_date']) {
+                        return $query->whereDate('publication_date', $data['publication_date']);
+                    }
+                    return $query;
+                })
             ])
             ->actions([
                 Tables\Actions\Action::make('send')
