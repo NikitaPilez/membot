@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Helpers\Download\ContentVideoInterface;
 use App\Helpers\Utils;
 use App\Models\Video;
+use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Intervention\Image\Facades\Image;
@@ -84,14 +85,21 @@ class DownloadVideoService
         ]);
     }
 
-    public function downloadPreviewImage(string $previewImgUrl): string
+    public function downloadPreviewImage(string $previewImgUrl): ?string
     {
-        $image = Image::make($previewImgUrl);
-        $image->encode('webp', 75);
-        $fileName =  date('Y-m-d H:i') . '.webp';
-        $savePath = storage_path('app/public/' . $fileName);
-        $image->save($savePath);
+        try {
+            $image = Image::make($previewImgUrl);
+            $image->encode('webp', 75);
+            $fileName =  date('Y-m-d H:i') . '.webp';
+            $savePath = storage_path('app/public/' . $fileName);
+            $image->save($savePath);
+        } catch (Exception $exception) {
+            Log::channel('content')->error('Ошибка при получении превью к видео', [
+                'message' => $exception->getMessage(),
+                'url' => $previewImgUrl,
+            ]);
+        }
 
-        return $fileName;
+        return $fileName ?? null;
     }
 }
