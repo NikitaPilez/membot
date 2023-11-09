@@ -69,7 +69,9 @@ class VideoResource extends Resource
                         '0' => 'Не отправлено',
                     ]),
                 Tables\Filters\Filter::make('publication_date')
-                    ->indicateUsing(fn (array $data) => 'Дата отправки ' . $data['publication_date'])
+//                    ->indicateUsing(function (array $data) {
+//
+//                    })
                 ->form([
                     Forms\Components\DatePicker::make('publication_date')
                         ->label('Дата отправки')
