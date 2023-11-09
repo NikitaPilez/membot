@@ -16,7 +16,14 @@ class VideoResource extends Resource
 {
     protected static ?string $model = Video::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-video-camera';
+
+    protected static ?string $navigationLabel = 'Управление видео';
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
 
     public static function form(Form $form): Form
     {
@@ -30,7 +37,7 @@ class VideoResource extends Resource
                 Forms\Components\TextInput::make('content_url')->label('Урл исходного видео')->disabled(),
                 Forms\Components\TextInput::make('type')->label('Соц. сеть')->disabled(),
                 Forms\Components\DateTimePicker::make('sent_at')->label('Когда отправлено?')->disabled(),
-                Forms\Components\DateTimePicker::make('publication_date')->label('Время отправки'),
+                Forms\Components\DateTimePicker::make('publication_date')->label('Время отправки')->native(false)->timezone('Europe/Minsk'),
                 Forms\Components\FileUpload::make('preview_image_path')->image()->disk('public')->disabled(),
                 Forms\Components\Toggle::make('is_sent')->label('Отправлено в телеграм?')->disabled(),
                 Forms\Components\Checkbox::make('is_prod')->label('Прод видео?')->disabled(fn (Video $video) => $video->is_sent),
@@ -42,8 +49,8 @@ class VideoResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('comment')->toggleable()->searchable()->label('Комментарий'),
-                Tables\Columns\TextColumn::make('publication_date')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Время отправки'),
-                Tables\Columns\TextColumn::make('sent_at')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Отправлено в'),
+                Tables\Columns\TextColumn::make('publication_date')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Время отправки')->sortable(),
+                Tables\Columns\TextColumn::make('sent_at')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Отправлено в')->sortable(),
                 Tables\Columns\ToggleColumn::make('is_sent')->disabled()->label('Отправлено?')->toggleable(),
                 Tables\Columns\CheckboxColumn::make('is_prod')->label('Прод?')->toggleable()->disabled(fn (Video $video) => $video->is_sent),
                 Tables\Columns\ImageColumn::make('preview_image_path')->label('Превью изображение')->toggleable()->square()->size(75),

@@ -25,4 +25,8 @@ class Video extends Model
         'is_prod',
         'description',
     ];
+
+    protected $casts = [
+        'publication_date' => 'datetime',
+    ];
 }

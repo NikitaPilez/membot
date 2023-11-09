@@ -27,9 +27,11 @@ Route::get('download', function () {
 
 Route::get('sendTelegram/{video}', [TelegramController::class, 'send'])->name('send.telegram');
 
-Route::group(['prefix' => 'download'], function () {
-    Route::post('video', [VideoController::class, 'downloadVideo']);
-    Route::post('content', [VideoController::class, 'downloadContent']);
+Route::group(['prefix' => 'admin'], function () {
+    Route::group(['prefix' => 'download'], function () {
+        Route::post('video', [VideoController::class, 'downloadVideo'])->name('download.video');
+        Route::post('content', [VideoController::class, 'downloadContent'])->name('download.content');
+    });
 });
 
 Route::get('register', [RegisterController::class, 'index'])->name('register');
