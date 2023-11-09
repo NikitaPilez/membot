@@ -16,6 +16,7 @@ class VideoStatOverview extends ChartWidget
             ->where('publication_date', '>', now())
             ->where('publication_date', '<', now()->addDays(7)->endOfDay())
             ->groupBy(DB::raw('date'))
+            ->orderBy(DB::raw('date'))
             ->get(array(
                 DB::raw('Date(publication_date) as date'),
                 DB::raw('COUNT(*) as "videos"')
