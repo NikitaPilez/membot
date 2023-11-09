@@ -21,10 +21,6 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::get('download', function () {
-    return view('download');
-});
-
 Route::get('sendTelegram/{video}', [TelegramController::class, 'send'])->name('send.telegram');
 
 Route::group(['prefix' => 'admin'], function () {
