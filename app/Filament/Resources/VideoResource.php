@@ -11,6 +11,7 @@ use Filament\Tables;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 
 class VideoResource extends Resource
 {
@@ -69,9 +70,14 @@ class VideoResource extends Resource
                         '0' => 'Не отправлено',
                     ]),
                 Tables\Filters\Filter::make('publication_date')
-//                    ->indicateUsing(function (array $data) {
-//
-//                    })
+                    ->indicateUsing(function (array $data): ?string {
+
+                        if (! $data['publication_date']) {
+                            return null;
+                        }
+
+                        return 'Дата публикации ' . Carbon::parse($data['publication_date'])->format('d.m.Y');
+                    })
                 ->form([
                     Forms\Components\DatePicker::make('publication_date')
                         ->label('Дата отправки')

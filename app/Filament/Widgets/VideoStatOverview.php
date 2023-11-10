@@ -17,21 +17,24 @@ class VideoStatOverview extends ChartWidget
             ->where('publication_date', '<', now()->addDays(7)->endOfDay())
             ->groupBy(DB::raw('date'))
             ->orderBy(DB::raw('date'))
-            ->get(array(
+            ->get([
                 DB::raw('Date(publication_date) as date'),
                 DB::raw('COUNT(*) as "videos"')
-            ))->toArray();
+            ])->keyBy('date')->toArray();
 
         $dates = [];
 
-        foreach ($data as $item) {
-            $dates[] = $item['date'];
+        $currentDate = now();
+
+        for ($i = 0; $i < 7; $i++) {
+            $dates[] = $currentDate->format('Y-m-d');
+            $currentDate->addDay();
         }
 
         $videosCount = [];
 
-        foreach ($data as $item) {
-            $videosCount[] = $item['videos'];
+        foreach ($dates as $date) {
+            $videosCount[] = $data[$date]['videos'] ?? 0;
         }
 
         return [
