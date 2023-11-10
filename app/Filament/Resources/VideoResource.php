@@ -56,10 +56,9 @@ class VideoResource extends Resource
                 Tables\Columns\CheckboxColumn::make('is_prod')->label('Прод?')->toggleable()->disabled(fn (Video $video) => $video->is_sent),
                 Tables\Columns\ImageColumn::make('preview_image_path')->label('Превью изображение')->toggleable()->square()->size(75),
                 Tables\Columns\TextColumn::make('description')->label('Описание к видео')->toggleable(),
+                Tables\Columns\ViewColumn::make('google_file_id')->view('tables.columns.google-file-link'),
                 Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Создано в')->toggleable(),
                 Tables\Columns\TextColumn::make('url')->limit(30)->toggleable()->label('Урл')->searchable(),
-                Tables\Columns\TextColumn::make('name')->toggleable()->label('Имя в гугл диске'),
-                Tables\Columns\TextColumn::make('google_file_id')->limit(30)->toggleable(),
                 Tables\Columns\TextColumn::make('content_url')->limit(30)->toggleable()->label('Исходный урл'),
                 Tables\Columns\TextColumn::make('type')->label('Соц. сеть')->toggleable(),
             ])
