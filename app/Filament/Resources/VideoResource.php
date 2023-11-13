@@ -6,12 +6,14 @@ use App\Filament\Resources\VideoResource\Pages;
 use App\Models\Video;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\HtmlString;
 
 class VideoResource extends Resource
 {
@@ -33,15 +35,22 @@ class VideoResource extends Resource
                 Forms\Components\TextInput::make('name')->label('Имя на гугл диске')->disabled(),
                 Forms\Components\TextInput::make('comment')->label('Комментарий'),
                 Forms\Components\TextInput::make('description')->label('Описание для видео'),
-                Forms\Components\TextInput::make('google_file_id')->label('ID на гугл диске')->disabled(),
                 Forms\Components\TextInput::make('url')->label('Урл видео')->disabled(),
                 Forms\Components\TextInput::make('content_url')->label('Урл исходного видео')->disabled(),
                 Forms\Components\TextInput::make('type')->label('Соц. сеть')->disabled(),
                 Forms\Components\DateTimePicker::make('sent_at')->label('Когда отправлено?')->disabled(),
                 Forms\Components\DateTimePicker::make('publication_date')->label('Время отправки')->native(false)->timezone('Europe/Minsk'),
-                Forms\Components\FileUpload::make('preview_image_path')->image()->disk('public')->disabled(),
-                Forms\Components\Toggle::make('is_sent')->label('Отправлено в телеграм?')->disabled(),
-                Forms\Components\Checkbox::make('is_prod')->label('Прод видео?')->disabled(fn (Video $video) => $video->is_sent),
+                Forms\Components\Grid::make([
+                    'default' => 1,
+                ])->schema([
+                    Forms\Components\Toggle::make('is_sent')->label('Отправлено в телеграм?')->disabled(),
+                    Forms\Components\Checkbox::make('is_prod')->label('Прод видео?')->disabled(fn (Video $video) => $video->is_sent),
+                    Forms\Components\Placeholder::make('google_file_id')->label('')
+                        ->content(function (Get $get) {
+                            return new HtmlString('<a target="_blank" style="text-decoration: underline" href="https://drive.google.com/file/d/' . $get('google_file_id') . '/view">Ссылка на видео в гугл диске</a>');
+                        }),
+                    Forms\Components\FileUpload::make('preview_image_path')->image()->disk('public')->disabled(),
+                ]),
             ]);
     }
 
@@ -56,7 +65,7 @@ class VideoResource extends Resource
                 Tables\Columns\CheckboxColumn::make('is_prod')->label('Прод?')->toggleable()->disabled(fn (Video $video) => $video->is_sent),
                 Tables\Columns\ImageColumn::make('preview_image_path')->label('Превью изображение')->toggleable()->square()->size(75),
                 Tables\Columns\TextColumn::make('description')->label('Описание к видео')->toggleable(),
-                Tables\Columns\ViewColumn::make('google_file_id')->view('tables.columns.google-file-link'),
+                Tables\Columns\ViewColumn::make('google_file_id')->view('tables.columns.google-file-link')->label('Ссылка на гугл диск'),
                 Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i', 'Europe/Minsk')->label('Создано в')->toggleable(),
                 Tables\Columns\TextColumn::make('url')->limit(30)->toggleable()->label('Урл')->searchable(),
                 Tables\Columns\TextColumn::make('content_url')->limit(30)->toggleable()->label('Исходный урл'),
