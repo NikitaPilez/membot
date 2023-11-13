@@ -7,6 +7,7 @@ use App\Helpers\Utils;
 use App\Models\Video;
 use Exception;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Intervention\Image\Facades\Image;
 
@@ -69,7 +70,15 @@ class DownloadVideoService
             $previewImagePath = $this->downloadPreviewImage($contentUrlResponse->previewImgUrl);
         }
 
-        $lastVideo = Video::where('is_sent', 0)->where('google_file_id', '!=', null)->where('publication_date', '>', now())->orderByDesc('publication_date')->first();
+        $lastVideo = Video::query()
+            ->where('is_sent', 0)
+            ->whereNotNull('google_file_id')
+            ->where('publication_date', '>', now())
+            ->orderByDesc('publication_date')
+            ->first()
+        ;
+
+        $publicationDate = $lastVideo ? Carbon::parse($lastVideo->publication_date) : now();
 
         Video::query()->create([
             'google_file_id' => $driveFile->getId(),
@@ -79,7 +88,7 @@ class DownloadVideoService
             'type' => $type,
             'comment' => $comment,
             'preview_image_path' => $previewImagePath ?? null,
-            'publication_date' => $lastVideo ? Carbon::parse($lastVideo->publication_date)->addHours(2) : now()->addHour()->addMinutes(rand(50, 80)),
+            'publication_date' => $publicationDate->addMinutes(rand(210, 300)),
             'is_prod' => $isProd,
             'description' => $description,
         ]);
