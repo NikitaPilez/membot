@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Helpers\Download\ContentVideoInterface;
 use App\Helpers\Download\InstagramContentVideo;
+use App\Helpers\Download\SimpleContentVideo;
 use App\Helpers\Download\SimpleConverter;
 use App\Helpers\Download\TikTokContentVideo;
 use App\Helpers\Download\YoutubeContentVideo;
@@ -27,6 +28,7 @@ class Utils
             'tiktok' => new TikTokContentVideo(),
             'youtube' => new YoutubeContentVideo(),
             'instagram' => new InstagramContentVideo(),
+            'video' => new SimpleContentVideo(),
             default => new SimpleConverter(),
         };
     }

@@ -4,30 +4,30 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Helpers\Utils;
+use App\Http\Requests\DownloadVideoRequest;
 use App\Jobs\DownloadVideoJob;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 
 class VideoController
 {
-    public function downloadVideo(Request $request): RedirectResponse
+    public function downloadVideo(DownloadVideoRequest $request): RedirectResponse
     {
         $url = (string) $request->input('url');
         $isProd = (boolean) $request->input('is_prod');
         $description = (string) $request->input('description');
         $comment = (string) $request->input('comment');
+        $type = (string) $request->input('type');
 
-        DownloadVideoJob::dispatch($url, Utils::getSocialTypeByLink($url), $isProd, $description, $comment);
+        /** @var UploadedFile $uploadedFile */
+        $uploadedFile = $request->file('video');
 
-        return back();
-    }
+        if ($uploadedFile) {
+            $uploadedFile->store();
+            $url = $uploadedFile->getRealPath();
+        }
 
-    public function downloadContent(Request $request): RedirectResponse
-    {
-        $isProd = (boolean) $request->input('is_prod');
-
-        DownloadVideoJob::dispatch($request->input('content_url'), 'simple', $isProd);
+        DownloadVideoJob::dispatch($url, $type, $isProd, $description, $comment);
 
         return back();
     }
