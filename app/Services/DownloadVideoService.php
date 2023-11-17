@@ -88,7 +88,7 @@ class DownloadVideoService
             'type' => $type,
             'comment' => $comment,
             'preview_image_path' => $previewImagePath ?? null,
-            'publication_date' => $publicationDate->addMinutes(rand(210, 300)),
+            'publication_date' => $lastVideo ? Carbon::parse($lastVideo->publication_date)->addHours(3) : now()->addMinutes(rand(210, 300)),
             'is_prod' => $isProd,
             'description' => $description,
         ]);
