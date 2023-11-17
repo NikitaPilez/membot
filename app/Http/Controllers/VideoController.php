@@ -8,6 +8,7 @@ use App\Http\Requests\DownloadVideoRequest;
 use App\Jobs\DownloadVideoJob;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class VideoController
 {
@@ -23,8 +24,8 @@ class VideoController
         $uploadedFile = $request->file('video');
 
         if ($uploadedFile) {
-            $uploadedFile->store();
-            $url = $uploadedFile->getRealPath();
+            Storage::putFileAs('public', $uploadedFile, $uploadedFile->getClientOriginalName());
+            $url = config('app.url') . Storage::url('public/' . $uploadedFile->getClientOriginalName());
         }
 
         DownloadVideoJob::dispatch($url, $type, $isProd, $description, $comment);
