@@ -3,8 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Jobs\CheckPotentialVideoJob;
-use App\Models\Channel;
-use App\Services\CheckPotentialVideoService;
 use Illuminate\Console\Command;
 
 class CheckPotentialVideos extends Command
