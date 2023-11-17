@@ -16,6 +16,18 @@ class CheckPotentialVideoService
     /**
      * @throws Exception
      */
+    public function run(): void
+    {
+        $channels =  Channel::query()->where('is_active', 1)->get();
+
+        foreach ($channels as $channel) {
+            $this->check($channel);
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
     public function check(Channel $channel): void
     {
         if ($channel->type === 'telegram') {

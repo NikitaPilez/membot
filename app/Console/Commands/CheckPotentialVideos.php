@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\CheckPotentialVideoJob;
 use App\Models\Channel;
 use App\Services\CheckPotentialVideoService;
 use Illuminate\Console\Command;
@@ -26,12 +27,8 @@ class CheckPotentialVideos extends Command
      * Execute the console command.
      * @throws \Exception
      */
-    public function handle(CheckPotentialVideoService $service): void
+    public function handle(): void
     {
-        $channels =  Channel::query()->where('is_active', 1)->get();
-
-        foreach ($channels as $channel) {
-            $service->check($channel);
-        }
+        CheckPotentialVideoJob::dispatch();
     }
 }
