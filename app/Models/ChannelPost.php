@@ -15,4 +15,8 @@ class ChannelPost extends Model
         'post_id',
         'publication_at',
     ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 }

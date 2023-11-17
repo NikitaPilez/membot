@@ -56,6 +56,12 @@ class CheckPotentialVideoService
         $dom = $page->dom();
         $elements = $dom->querySelectorAll('.tgme_widget_message_wrap');
 
+        if (!$elements) {
+            Log::channel('content')->error('Не найдены посты.', [
+                'alias' => $channelAlias,
+            ]);
+        }
+
         /** @var ChannelPostDTO[] $channelPosts */
         $channelPosts = [];
 
@@ -74,7 +80,7 @@ class CheckPotentialVideoService
                     views: $this->getHumanViews($views),
                 );
             } else {
-                Log::channel('content')->info('Не достаточно информации о посте.', [
+                Log::channel('content')->error('Не достаточно информации о посте.', [
                     'alias' => $channelAlias,
                     'id' => $id,
                     'views' => $views,
