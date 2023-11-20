@@ -6,8 +6,9 @@ use App\Helpers\Download\ContentVideoInterface;
 use App\Helpers\Utils;
 use App\Models\Video;
 use Exception;
+use FFMpeg\Coordinate\TimeCode;
+use FFMpeg\FFMpeg;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Intervention\Image\Facades\Image;
 
@@ -66,9 +67,7 @@ class DownloadVideoService
             'contentUrl' => $contentUrlResponse->sourceUrl,
         ]);
 
-        if ($contentUrlResponse->previewImgUrl) {
-            $previewImagePath = $this->downloadPreviewImage($contentUrlResponse->previewImgUrl);
-        }
+        $previewImageUrl = $this->getPreviewImageUrl($contentUrlResponse->sourceUrl, $contentUrlResponse->previewImgUrl);
 
         $lastVideo = Video::query()
             ->where('is_sent', 0)
@@ -78,8 +77,6 @@ class DownloadVideoService
             ->first()
         ;
 
-        $publicationDate = $lastVideo ? Carbon::parse($lastVideo->publication_date) : now();
-
         Video::query()->create([
             'google_file_id' => $driveFile->getId(),
             'name' => $fileName,
@@ -87,28 +84,57 @@ class DownloadVideoService
             'content_url' => $contentUrlResponse->sourceUrl,
             'type' => $type,
             'comment' => $comment,
-            'preview_image_path' => $previewImagePath ?? null,
+            'preview_image_path' => $previewImageUrl,
             'publication_date' => $lastVideo ? Carbon::parse($lastVideo->publication_date)->addHours(3) : now()->addMinutes(rand(210, 300)),
             'is_prod' => $isProd,
             'description' => $description,
         ]);
     }
 
-    public function downloadPreviewImage(string $previewImgUrl): ?string
+    public function compressPreviewImage(string $previewImgUrl): ?string
     {
         try {
             $image = Image::make($previewImgUrl);
             $image->encode('webp', 75);
-            $fileName =  date('Y-m-d H:i') . '.webp';
+            $fileName = date('Y-m-d H:i') . '.webp';
             $savePath = storage_path('app/public/' . $fileName);
             $image->save($savePath);
         } catch (Exception $exception) {
-            Log::channel('content')->error('Ошибка при получении превью к видео', [
+            Log::channel('content')->error('Ошибка при сжатии превью к видео', [
                 'message' => $exception->getMessage(),
                 'url' => $previewImgUrl,
             ]);
         }
 
         return $fileName ?? null;
+    }
+
+    public function getPreviewImageUrl(string $videoSourceUrl, ?string $previewImageUrl): ?string
+    {
+        if (!$previewImageUrl) {
+            $previewImageUrl = $this->getPreviewImageFromVideo($videoSourceUrl);
+        }
+
+        return $previewImageUrl ? $this->compressPreviewImage($previewImageUrl) : null;
+    }
+
+    public function getPreviewImageFromVideo(string $videoSourceUrl): ?string
+    {
+        try {
+            $fileName = 'preview' . time() . '.png';
+            $thumbnail = storage_path('app/public/' . $fileName);
+            $ffmpeg = FFMpeg::create();
+            $video = $ffmpeg->open($videoSourceUrl);
+            $frame = $video->frame(TimeCode::fromSeconds(1));
+            $frame->save($thumbnail);
+            return config('app.url') . '/storage/' . $fileName;
+        } catch (Exception $exception) {
+            Log::channel('content')->error('Ошибка при попытке получить превью из видео', [
+                'message' => $exception->getMessage(),
+                'sourceUrl' => $videoSourceUrl,
+            ]);
+
+            return null;
+        }
     }
 }
