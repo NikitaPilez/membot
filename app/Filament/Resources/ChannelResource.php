@@ -21,6 +21,10 @@ class ChannelResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar';
 
+    protected static ?int $navigationSort = 3;
+
+    protected static ?string $navigationGroup = 'Каналы';
+
     public static function form(Form $form): Form
     {
         return $form

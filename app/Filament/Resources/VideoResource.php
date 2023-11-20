@@ -23,6 +23,10 @@ class VideoResource extends Resource
 
     protected static ?string $navigationLabel = 'Управление видео';
 
+    protected static ?int $navigationSort = 2;
+
+    protected static ?string $navigationGroup = 'Видео';
+
     public static function canCreate(): bool
     {
         return false;

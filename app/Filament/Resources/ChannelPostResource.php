@@ -22,6 +22,11 @@ class ChannelPostResource extends Resource
 
     protected static ?string $navigationLabel = 'Посты каналов';
 
+    protected static ?int $navigationSort = 4;
+
+    protected static ?string $navigationGroup = 'Каналы';
+
+
     public static function canCreate(): bool
     {
         return false;
@@ -36,9 +41,8 @@ class ChannelPostResource extends Resource
                 Forms\Components\TextInput::make('post_id')
                     ->label('ID поста')
                     ->disabled(),
-                Forms\Components\TextInput::make('description')
-                    ->label('Описание')
-                    ->disabled(),
+                Forms\Components\RichEditor::make('description')
+                    ->label('Описание'),
                 Forms\Components\DateTimePicker::make('publication_at')
                     ->label('Время публикации?')
                     ->disabled(),
@@ -58,7 +62,7 @@ class ChannelPostResource extends Resource
                 Tables\Columns\TextColumn::make('publication_at')
                     ->toggleable()
                     ->label('Время опубликования')
-                    ->dateTime('d.m.Y H:i', 'Europe/Minsk'),
+                    ->dateTime('d.m.Y H:i'),
                 Tables\Columns\TextColumn::make('description')
                     ->toggleable()
                     ->label('Описание')

@@ -13,6 +13,10 @@ class Video extends Page
 
     protected static ?string $navigationLabel = 'Загрузить видео';
 
+    protected static ?int $navigationSort = 1;
+
+    protected static ?string $navigationGroup = 'Видео';
+
     /**
      * @return string
      */
