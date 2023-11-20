@@ -5,10 +5,10 @@ namespace App\Services;
 use App\DTO\ChannelPostDTO;
 use App\Models\Channel;
 use App\Models\ChannelPost;
-use App\Models\ChannelPostStat;
 use Exception;
 use HeadlessChromium\BrowserFactory;
 use HeadlessChromium\Dom\Node;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -63,13 +63,18 @@ class CheckPotentialVideoService
                 ]);
             }
 
-            /** @var ChannelPost $channelPost */
-            $channelPost = $newChannelPost ?? $existsChannelPosts->get($parsedChannelPost->id);
+            $this->updateViewsStat($newChannelPost ?? $existsChannelPosts->get($parsedChannelPost->id), $parsedChannelPost->views);
+        }
+    }
 
-            ChannelPostStat::query()->create([
-                'channel_post_id' => $channelPost->id,
-                'views' => $parsedChannelPost->views,
-            ]);
+    public function updateViewsStat(ChannelPost $channelPost, int $views): void
+    {
+        $publicationAt = Carbon::createFromFormat('Y-m-d H:i:s', $channelPost->publication_at);
+        $oneHourAgo = Carbon::now()->subHour();
+
+        if ($publicationAt->lessThan($oneHourAgo) && !$channelPost->views_after_hour) {
+            $channelPost->views_after_hour = $views;
+            $channelPost->save();
         }
     }
 
