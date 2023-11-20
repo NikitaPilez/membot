@@ -5,9 +5,11 @@ namespace App\Services;
 use App\DTO\ChannelPostDTO;
 use App\Models\Channel;
 use App\Models\ChannelPost;
+use App\Models\ChannelPostStat;
 use Exception;
 use HeadlessChromium\BrowserFactory;
 use HeadlessChromium\Dom\Node;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -31,20 +33,43 @@ class CheckPotentialVideoService
     public function check(Channel $channel): void
     {
         if ($channel->type === 'telegram') {
-            $channelPosts = $this->getChannelPosts($channel);
+            $parsedChannelPosts = $this->getChannelPosts($channel);
+            $this->createNewChannelPostAndStat($channel->id, $parsedChannelPosts);
+        }
+    }
 
-            $postIds = ChannelPost::query()->where('channel_id', $channel->id)->pluck('post_id')->toArray();
+    public function createNewChannelPostAndStat(int $channelId, array $parsedChannelPosts): void
+    {
+        $existsPostIds = Cache::remember('exists-post-ids-' . $channelId, 60, function () use ($channelId) {
+            return ChannelPost::query()->where('channel_id', $channelId)->pluck('post_id')->toArray();
+        });
 
-            foreach ($channelPosts as $channelPost) {
-                if (!in_array($channelPost->id, $postIds)) {
-                    ChannelPost::query()->create([
-                        'channel_id' => $channel->id,
-                        'post_id' => $channelPost->id,
-                        'description' => $channelPost->description,
-                        'publication_at' => $channelPost->createdAt,
-                    ]);
-                }
+        $existsChannelPosts = Cache::remember('exists-channel-posts-' . $channelId, 60, function () use ($channelId) {
+            return ChannelPost::query()->where('channel_id', $channelId)->get()->keyBy('post_id');
+        });
+
+        /** @var ChannelPostDTO $parsedChannelPost */
+        foreach ($parsedChannelPosts as $parsedChannelPost) {
+
+            $newChannelPost = null;
+
+            if (!in_array($parsedChannelPost->id, $existsPostIds)) {
+                /** @var ChannelPost $channelPost */
+                $newChannelPost = ChannelPost::query()->create([
+                    'channel_id' => $channelId,
+                    'post_id' => $parsedChannelPost->id,
+                    'description' => $parsedChannelPost->description,
+                    'publication_at' => $parsedChannelPost->createdAt,
+                ]);
             }
+
+            /** @var ChannelPost $channelPost */
+            $channelPost = $newChannelPost ?? $existsChannelPosts->get($parsedChannelPost->id);
+
+            ChannelPostStat::query()->create([
+                'channel_post_id' => $channelPost->id,
+                'views' => $parsedChannelPost->views,
+            ]);
         }
     }
 
