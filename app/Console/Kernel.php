@@ -21,7 +21,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command(SendVideoInTelegramCommand::class)->everyMinute();
-        $schedule->command(CheckPotentialVideos::class)->everyMinute();
+        $schedule->command(CheckPotentialVideos::class)->everyFiveMinutes();
         $schedule->command(UpdateChannelPostStatCommand::class)->everyMinute();
     }
 

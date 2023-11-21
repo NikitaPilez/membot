@@ -43,6 +43,10 @@ class CheckPotentialVideoService
             return ChannelPost::query()->where('channel_id', $channel->id)->pluck('post_id')->toArray();
         });
 
+        $existsChannelPosts = Cache::remember('exists-channel-posts-' . $channel->id, 60, function () use ($channel) {
+            return ChannelPost::query()->where('channel_id', $channel->id)->get()->keyBy('post_id');
+        });
+
         /** @var ChannelPostDTO $parsedChannelPost */
         foreach ($parsedChannelPosts as $parsedChannelPost) {
             if (!in_array($parsedChannelPost->id, $existsPostIds)) {
@@ -58,6 +62,10 @@ class CheckPotentialVideoService
                 Log::channel('content')->info('Новый пост с канала ' . $channel->name, [
                     'post_id' => $post->id,
                 ]);
+            } else {
+                $channelPost = $existsChannelPosts->get($parsedChannelPost->id);
+                $channelPost->views = $parsedChannelPost->views;
+                $channelPost->save();
             }
         }
     }
