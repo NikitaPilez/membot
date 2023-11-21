@@ -65,22 +65,6 @@ class ChannelPostResource extends Resource
                     ->toggleable()
                     ->label('Время опубликования')
                     ->dateTime('d.m.Y H:i'),
-                Tables\Columns\TextColumn::make('stat.views_after_hour')
-                    ->toggleable()
-                    ->label('Просмотры за час')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('stat.views_after_sixth_hour')
-                    ->toggleable()
-                    ->label('Просмотры за 6 часов')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('stat.views_after_twelve_hour')
-                    ->toggleable()
-                    ->label('Просмотры за 12 часов')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('stat.views_after_day')
-                    ->toggleable()
-                    ->label('Просмотры за сутки')
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('description')
                     ->toggleable()
                     ->label('Описание')
@@ -112,6 +96,7 @@ class ChannelPostResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Action::make('stat')
                     ->label('Статистика')
+                    ->icon('heroicon-m-chart-bar-square')
                     ->modalContent(fn (ChannelPost $channelPost) => view('filament.stat.channel_post_stat', [
                         'channelPost' => $channelPost
                     ]))
