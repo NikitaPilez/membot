@@ -24,10 +24,6 @@ class UpdateChannelPostStatService
     public function updateViewsStat(ChannelPost $channelPost): void
     {
         $publicationAt = Carbon::createFromFormat('Y-m-d H:i:s', $channelPost->publication_at);
-        $oneHourAgo = Carbon::now()->subHour();
-        $sixthHoursAgo = Carbon::now()->subHours(6);
-        $twelveHoursAgo = Carbon::now()->subHours(12);
-        $dayAgo = Carbon::now()->subDay();
 
         $channelPostStat = $channelPost->stat;
 
@@ -36,19 +32,15 @@ class UpdateChannelPostStatService
             $channelPostStat->channel_post_id = $channelPost->id;
         }
 
-        if ($publicationAt->lessThan($oneHourAgo) && !$channelPost->views_after_hour) {
+        $now = Carbon::now();
+
+        if ($publicationAt->lessThan($now->subHour()) && $publicationAt->greaterThan($now->subHour()->addMinutes(10)) && !$channelPostStat->views_after_hour) {
             $channelPostStat->views_after_hour = $channelPost->views;
-        }
-
-        if ($publicationAt->lessThan($sixthHoursAgo) && !$channelPost->views_after_sixth_hour) {
+        } else if ($publicationAt->lessThan($now->subHours(6)) && $publicationAt->greaterThan($now->subHours(6)->subMinutes(10)) && !$channelPostStat->views_after_sixth_hour) {
             $channelPostStat->views_after_sixth_hour = $channelPost->views;
-        }
-
-        if ($publicationAt->lessThan($twelveHoursAgo) && !$channelPost->views_after_twelve_hour) {
+        } else if ($publicationAt->lessThan(Carbon::now()->subHours(12)) && $publicationAt->greaterThan($now->subHours(12)->subMinutes(10)) && !$channelPostStat->views_after_twelve_hour) {
             $channelPostStat->views_after_twelve_hour = $channelPost->views;
-        }
-
-        if ($publicationAt->lessThan($dayAgo) && !$channelPost->views_after_day) {
+        } else if ($publicationAt->lessThan(Carbon::now()->subDay()) && $publicationAt->greaterThan($now->subDay()->subMinutes(10)) && !$channelPostStat->views_after_day) {
             $channelPostStat->views_after_day = $channelPost->views;
         }
 

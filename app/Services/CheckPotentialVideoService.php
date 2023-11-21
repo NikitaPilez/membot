@@ -51,7 +51,7 @@ class CheckPotentialVideoService
         foreach ($parsedChannelPosts as $parsedChannelPost) {
             if (!in_array($parsedChannelPost->id, $existsPostIds)) {
                 /** @var ChannelPost $channelPost */
-                $post = ChannelPost::query()->create([
+                $channelPost = ChannelPost::query()->create([
                     'channel_id' => $channel->id,
                     'post_id' => $parsedChannelPost->id,
                     'description' => $parsedChannelPost->description,
@@ -60,7 +60,7 @@ class CheckPotentialVideoService
                 ]);
 
                 Log::channel('content')->info('Новый пост с канала ' . $channel->name, [
-                    'post_id' => $post->id,
+                    'post_id' => $channelPost->id,
                 ]);
             } else {
                 $channelPost = $existsChannelPosts->get($parsedChannelPost->id);

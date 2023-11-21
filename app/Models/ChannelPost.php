@@ -6,7 +6,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property-read int $id
+ * @property int $channel_id
+ * @property string|null $description
+ * @property int $post_id
+ * @property Carbon $publication_at
+ * @property integer $views
+ * @property Carbon $created_at
+ * @property Channel $channel
+ * @property Stat $stat
+ */
 class ChannelPost extends Model
 {
     use HasFactory;
