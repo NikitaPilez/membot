@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @property-read int $id
@@ -44,5 +45,33 @@ class ChannelPost extends Model
     public function stat(): HasOne
     {
         return $this->hasOne(ChannelPostStat::class);
+    }
+
+    public function getAverageCountViewsByTime(string $mode): float
+    {
+        if ($mode === 'hour') {
+            $column = 'views_after_hour';
+        } elseif ($mode === 'sixth') {
+            $column = 'views_after_sixth_hour';
+        } elseif ($mode === 'twelve') {
+            $column = 'views_after_twelve_hour';
+        } elseif ($mode === 'day') {
+            $column = 'views_after_day';
+        } else {
+            return 0;
+        }
+
+        $result = DB::table('channels as c')
+            ->select([DB::raw('SUM(cps.' . $column . ') as sum'), DB::raw('COUNT(cps.' . $column . ') as count')])
+            ->join('channel_posts as cp', 'cp.channel_id', '=', 'c.id')
+            ->join('channel_post_stats as cps', 'cps.channel_post_id', '=', 'cp.id')
+            ->where('cp.channel_id', $this->channel_id)
+            ->first();
+
+        if ($result->count) {
+            return round(($result->sum / $result->count));
+        }
+
+        return 0;
     }
 }

@@ -9,6 +9,8 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Enums\ActionsPosition;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -63,6 +65,22 @@ class ChannelPostResource extends Resource
                     ->toggleable()
                     ->label('Время опубликования')
                     ->dateTime('d.m.Y H:i'),
+                Tables\Columns\TextColumn::make('stat.views_after_hour')
+                    ->toggleable()
+                    ->label('Просмотры за час')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('stat.views_after_sixth_hour')
+                    ->toggleable()
+                    ->label('Просмотры за 6 часов')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('stat.views_after_twelve_hour')
+                    ->toggleable()
+                    ->label('Просмотры за 12 часов')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('stat.views_after_day')
+                    ->toggleable()
+                    ->label('Просмотры за сутки')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('description')
                     ->toggleable()
                     ->label('Описание')
@@ -92,7 +110,14 @@ class ChannelPostResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-            ])
+                Action::make('stat')
+                    ->label('Статистика')
+                    ->modalContent(fn (ChannelPost $channelPost) => view('filament.stat.channel_post_stat', [
+                        'channelPost' => $channelPost
+                    ]))
+                    ->modalSubmitAction(false)
+                    ->modalCancelAction(false)
+            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
