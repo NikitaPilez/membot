@@ -8,7 +8,6 @@ use App\Models\ChannelPost;
 use Exception;
 use HeadlessChromium\BrowserFactory;
 use HeadlessChromium\Dom\Node;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -34,47 +33,32 @@ class CheckPotentialVideoService
     {
         if ($channel->type === 'telegram') {
             $parsedChannelPosts = $this->getChannelPosts($channel);
-            $this->createNewChannelPostAndStat($channel->id, $parsedChannelPosts);
+            $this->createNewChannelPosts($channel, $parsedChannelPosts);
         }
     }
 
-    public function createNewChannelPostAndStat(int $channelId, array $parsedChannelPosts): void
+    public function createNewChannelPosts(Channel $channel, array $parsedChannelPosts): void
     {
-        $existsPostIds = Cache::remember('exists-post-ids-' . $channelId, 60, function () use ($channelId) {
-            return ChannelPost::query()->where('channel_id', $channelId)->pluck('post_id')->toArray();
-        });
-
-        $existsChannelPosts = Cache::remember('exists-channel-posts-' . $channelId, 60, function () use ($channelId) {
-            return ChannelPost::query()->where('channel_id', $channelId)->get()->keyBy('post_id');
+        $existsPostIds = Cache::remember('exists-post-ids-' . $channel->id, 60, function () use ($channel) {
+            return ChannelPost::query()->where('channel_id', $channel->id)->pluck('post_id')->toArray();
         });
 
         /** @var ChannelPostDTO $parsedChannelPost */
         foreach ($parsedChannelPosts as $parsedChannelPost) {
-
-            $newChannelPost = null;
-
             if (!in_array($parsedChannelPost->id, $existsPostIds)) {
                 /** @var ChannelPost $channelPost */
-                $newChannelPost = ChannelPost::query()->create([
-                    'channel_id' => $channelId,
+                $post = ChannelPost::query()->create([
+                    'channel_id' => $channel->id,
                     'post_id' => $parsedChannelPost->id,
                     'description' => $parsedChannelPost->description,
                     'publication_at' => $parsedChannelPost->createdAt,
+                    'views' => $parsedChannelPost->views,
+                ]);
+
+                Log::channel('content')->info('Новый пост с канала ' . $channel->name, [
+                    'post_id' => $post->id,
                 ]);
             }
-
-            $this->updateViewsStat($newChannelPost ?? $existsChannelPosts->get($parsedChannelPost->id), $parsedChannelPost->views);
-        }
-    }
-
-    public function updateViewsStat(ChannelPost $channelPost, int $views): void
-    {
-        $publicationAt = Carbon::createFromFormat('Y-m-d H:i:s', $channelPost->publication_at);
-        $oneHourAgo = Carbon::now()->subHour();
-
-        if ($publicationAt->lessThan($oneHourAgo) && !$channelPost->views_after_hour) {
-            $channelPost->views_after_hour = $views;
-            $channelPost->save();
         }
     }
 

@@ -6,6 +6,7 @@ namespace App\Console;
 
 use App\Console\Commands\CheckPotentialVideos;
 use App\Console\Commands\SendVideoInTelegramCommand;
+use App\Console\Commands\UpdateChannelPostStatCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -20,7 +21,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command(SendVideoInTelegramCommand::class)->everyMinute();
-        $schedule->command(CheckPotentialVideos::class)->everyTenMinutes();
+        $schedule->command(CheckPotentialVideos::class)->everyMinute();
+        $schedule->command(UpdateChannelPostStatCommand::class)->everyMinute();
     }
 
     /**
