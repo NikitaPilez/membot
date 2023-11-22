@@ -12,8 +12,8 @@ class UpdateChannelPostStatService
     {
         $channelPosts = ChannelPost::query()
             ->whereRelation('channel', 'is_active', 1)
-            ->whereDate('publication_at', '<', Carbon::now()->subHour())
-            ->where('publication_at', '>', Carbon::now()->subDay())
+            ->where('publication_at', '<', Carbon::now()->subHour())
+            ->where('publication_at', '>', Carbon::now()->subDay()->subMinutes(10))
             ->get();
 
         foreach ($channelPosts as $post) {
@@ -34,7 +34,7 @@ class UpdateChannelPostStatService
 
         $now = Carbon::now();
 
-        if ($publicationAt->lessThan($now->subHour()) && $publicationAt->greaterThan($now->subHour()->addMinutes(10)) && !$channelPostStat->views_after_hour) {
+        if ($publicationAt->lessThan($now->subHour()) && $publicationAt->greaterThan($now->subHour()->subMinutes(10)) && !$channelPostStat->views_after_hour) {
             $channelPostStat->views_after_hour = $channelPost->views;
         } else if ($publicationAt->lessThan($now->subHours(6)) && $publicationAt->greaterThan($now->subHours(6)->subMinutes(10)) && !$channelPostStat->views_after_sixth_hour) {
             $channelPostStat->views_after_sixth_hour = $channelPost->views;
