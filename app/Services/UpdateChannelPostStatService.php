@@ -17,8 +17,6 @@ class UpdateChannelPostStatService
     {
         $channels = Channel::query()
             ->where('is_active', 1)
-//            ->where('publication_at', '>', Carbon::now()->subDay()->subMinutes(10))
-            ->where('id', 1)
             ->get();
 
         foreach ($channels as $channel) {
