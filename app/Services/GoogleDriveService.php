@@ -65,7 +65,7 @@ class GoogleDriveService
         try {
             $response = $this->service->files->get($file->getId(), ['alt' => 'media']);
 
-            file_put_contents(storage_path('app/public') . '/' . $file->getName(), $response->getBody()->getContents());
+            file_put_contents(storage_path() . '/app/public/' . $file->getName(), $response->getBody()->getContents());
 
             Log::channel('content')->info('Файл загружен на сервер.', [
                 'fileId' => $file->getId(),

@@ -31,7 +31,7 @@ class TelegramService
 
         $params = [
             'chat_id' => $video->is_prod ? config('services.telegram.chat_id_prod') : config('services.telegram.chat_id_dev'),
-            'video' => config('app.url') . '/' . $video->name,
+            'video' => config('app.url') . '/storage/' . $video->name,
             'caption' => $description,
             'parse_mode' => 'markdown'
         ];
