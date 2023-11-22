@@ -10,12 +10,9 @@ use Illuminate\Support\Carbon;
 /**
  * @property-read int $id
  * @property int $channel_post_id
- * @property int|null $views_after_hour
- * @property int|null $views_after_sixth_hour
- * @property int|null $views_after_twelve_hour
- * @property int|null $views_after_day
+ * @property int $views
+ * @property int $shares
  * @property Carbon $created_at
- * @property Channel $channel
  */
 class ChannelPostStat extends Model
 {
@@ -25,16 +22,15 @@ class ChannelPostStat extends Model
 
     protected $fillable = [
         'channel_post_id',
-        'views_after_hour',
-        'views_after_sixth_hour',
+        'views',
+        'shares',
         'views_after_twelve_hour',
         'views_after_day',
     ];
 
     protected $casts = [
-        'views_after_hour' => 'integer',
-        'views_after_sixth_hour' => 'integer',
-        'views_after_twelve_hour' => 'integer',
-        'views_after_day' => 'integer',
+        'channel_post_id' => 'integer',
+        'shares' => 'integer',
+        'views' => 'integer',
     ];
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -24,4 +25,16 @@ class Channel extends Model
         'url',
         'is_active',
     ];
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(ChannelPost::class);
+    }
+
+    public function getChannelAlias(): string
+    {
+        $splitBySlashArray = explode('/', $this->url);
+
+        return end($splitBySlashArray);
+    }
 }

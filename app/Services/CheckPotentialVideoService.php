@@ -14,9 +14,6 @@ use Illuminate\Support\Str;
 
 class CheckPotentialVideoService
 {
-    /**
-     * @throws Exception
-     */
     public function run(): void
     {
         $channels =  Channel::query()->where('is_active', 1)->get();
@@ -26,9 +23,6 @@ class CheckPotentialVideoService
         }
     }
 
-    /**
-     * @throws Exception
-     */
     public function check(Channel $channel): void
     {
         if ($channel->type === 'telegram') {
@@ -43,10 +37,6 @@ class CheckPotentialVideoService
             return ChannelPost::query()->where('channel_id', $channel->id)->pluck('post_id')->toArray();
         });
 
-        $existsChannelPosts = Cache::remember('exists-channel-posts-' . $channel->id, 60, function () use ($channel) {
-            return ChannelPost::query()->where('channel_id', $channel->id)->get()->keyBy('post_id');
-        });
-
         /** @var ChannelPostDTO $parsedChannelPost */
         foreach ($parsedChannelPosts as $parsedChannelPost) {
             if (!in_array($parsedChannelPost->id, $existsPostIds)) {
@@ -56,28 +46,21 @@ class CheckPotentialVideoService
                     'post_id' => $parsedChannelPost->id,
                     'description' => $parsedChannelPost->description,
                     'publication_at' => $parsedChannelPost->createdAt,
-                    'views' => $parsedChannelPost->views,
                 ]);
 
                 Log::channel('content')->info('Новый пост с канала ' . $channel->name, [
                     'post_id' => $channelPost->id,
                 ]);
-            } else {
-                $channelPost = $existsChannelPosts->get($parsedChannelPost->id);
-                $channelPost->views = $parsedChannelPost->views;
-                $channelPost->save();
             }
         }
     }
 
     /**
-     * @throws Exception
-     *
      * @return array<ChannelPostDTO>
      */
     public function getChannelPosts(Channel $channel): array
     {
-        $channelAlias = $this->getChannelAlias($channel->url);
+        $channelAlias = $channel->getChannelAlias();
 
         $browserFactory = new BrowserFactory();
         $browser = $browserFactory->createBrowser([
@@ -138,19 +121,5 @@ class CheckPotentialVideoService
         } else {
             return (int) $views;
         }
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getChannelAlias(string $channelUrl): string
-    {
-        $splitBySlashArray = explode('/', $channelUrl);
-
-        if (!$splitBySlashArray) {
-            throw new Exception('Ошибка при получении alias у канала ' . $channelUrl);
-        }
-
-        return end($splitBySlashArray);
     }
 }

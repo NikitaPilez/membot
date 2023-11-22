@@ -2,29 +2,104 @@
 
 namespace App\Services;
 
+use App\DTO\ChannelPostTGStatDTO;
+use App\Models\Channel;
 use App\Models\ChannelPost;
 use App\Models\ChannelPostStat;
+use HeadlessChromium\BrowserFactory;
+use HeadlessChromium\Dom\Node;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class UpdateChannelPostStatService
 {
     public function run(): void
     {
-        $channelPosts = ChannelPost::query()
-            ->whereRelation('channel', 'is_active', 1)
-            ->where('publication_at', '<', Carbon::now()->subHour())
-            ->where('publication_at', '>', Carbon::now()->subDay()->subMinutes(10))
+        $channels = Channel::query()
+            ->where('is_active', 1)
+//            ->where('publication_at', '>', Carbon::now()->subDay()->subMinutes(10))
+            ->where('id', 1)
             ->get();
 
-        foreach ($channelPosts as $post) {
-            $this->updateViewsStat($post);
+        foreach ($channels as $channel) {
+            $channelPostStats = $this->getChannelStat($channel);
+
+            $channelPosts = ChannelPost::query()->where('channel_id', $channel->id)->get()->keyBy('post_id');
+            foreach ($channelPostStats as $post) {
+                if ($channelPost = $channelPosts->get($post->id)) {
+                    $this->updateViewsStat($channelPost, $post);
+                }
+
+            }
         }
     }
 
-    public function updateViewsStat(ChannelPost $channelPost): void
+    public function getChannelStat(Channel $channel): array
     {
-        $publicationAt = Carbon::createFromFormat('Y-m-d H:i:s', $channelPost->publication_at);
+        $channelAlias = $channel->getChannelAlias();
 
+        $browserFactory = new BrowserFactory();
+        $browser = $browserFactory->createBrowser([
+            'customFlags' => ['--disable-blink-features', '--disable-blink-features=AutomationControlled'],
+            'sendSyncDefaultTimeout' => 10000,
+        ]);
+
+        $page = $browser->createPage();
+        $page->navigate('https://tgstat.ru/ru/channel/@' . $channelAlias)->waitForNavigation();
+        $dom = $page->dom();
+        $elements = $dom->querySelectorAll('[id^="post-"]');
+
+        if (!$elements) {
+            Log::channel('content')->error('Не найдены посты.', [
+                'alias' => $channelAlias,
+            ]);
+        }
+
+        /** @var ChannelPostTGStatDTO[] $channelPostsStat */
+        $channelPostsStat = [];
+
+        /** @var Node $element */
+        foreach ($elements as $element) {
+            $shares = $element->querySelector('[data-original-title="Пересылок всего"]')?->getText();
+            $id = $element->querySelector('[data-original-title="Количество просмотров публикации"]')?->getAttribute('href');
+            $views = $element->querySelector('[data-original-title="Количество просмотров публикации"]')?->getText();
+            preg_match('/\/(\d+)\/stat/', $id, $matches);
+            $id = (int) $matches[1];
+
+            if ($views && $shares && $id) {
+                $channelPostsStat[] = new ChannelPostTGStatDTO(
+                    id: $id,
+                    views: $this->getHumanViews($views),
+                    shares: $shares,
+                );
+            } else {
+                Log::channel('content')->error('Не достаточно информации о посте.', [
+                    'alias' => $channelAlias,
+                    'id' => $id,
+                    'views' => $views,
+                    'shares' => $shares,
+                ]);
+            }
+        }
+
+        $browser->close();
+
+        return $channelPostsStat;
+    }
+
+    public function getHumanViews(string $views): float|int
+    {
+        $position = strpos($views, 'k');
+
+        if ($position !== false) {
+            return (float) str_replace('k', '', $views) * 1000;
+        } else {
+            return (int) $views;
+        }
+    }
+
+    public function updateViewsStat(ChannelPost $channelPost, ChannelPostTGStatDTO $channelPostTGStatDTO): void
+    {
         $channelPostStat = $channelPost->stat;
 
         if (!$channelPost->stat) {
@@ -32,17 +107,8 @@ class UpdateChannelPostStatService
             $channelPostStat->channel_post_id = $channelPost->id;
         }
 
-        $now = Carbon::now();
-
-        if ($publicationAt->lessThan($now->subHour()) && $publicationAt->greaterThan($now->subHour()->subMinutes(10)) && !$channelPostStat->views_after_hour) {
-            $channelPostStat->views_after_hour = $channelPost->views;
-        } else if ($publicationAt->lessThan($now->subHours(6)) && $publicationAt->greaterThan($now->subHours(6)->subMinutes(10)) && !$channelPostStat->views_after_sixth_hour) {
-            $channelPostStat->views_after_sixth_hour = $channelPost->views;
-        } else if ($publicationAt->lessThan(Carbon::now()->subHours(12)) && $publicationAt->greaterThan($now->subHours(12)->subMinutes(10)) && !$channelPostStat->views_after_twelve_hour) {
-            $channelPostStat->views_after_twelve_hour = $channelPost->views;
-        } else if ($publicationAt->lessThan(Carbon::now()->subDay()) && $publicationAt->greaterThan($now->subDay()->subMinutes(10)) && !$channelPostStat->views_after_day) {
-            $channelPostStat->views_after_day = $channelPost->views;
-        }
+        $channelPostStat->views = $channelPostTGStatDTO->views;
+        $channelPostStat->shares = $channelPostTGStatDTO->shares;
 
         $channelPostStat->save();
     }

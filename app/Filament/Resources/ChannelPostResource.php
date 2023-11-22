@@ -92,17 +92,17 @@ class ChannelPostResource extends Resource
                         return $query;
                     })
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Action::make('stat')
-                    ->label('Статистика')
-                    ->icon('heroicon-m-chart-bar-square')
-                    ->modalContent(fn (ChannelPost $channelPost) => view('filament.stat.channel_post_stat', [
-                        'channelPost' => $channelPost
-                    ]))
-                    ->modalSubmitAction(false)
-                    ->modalCancelAction(false)
-            ], position: ActionsPosition::BeforeColumns)
+//            ->actions([
+//                Tables\Actions\EditAction::make(),
+//                Action::make('stat')
+//                    ->label('Статистика')
+//                    ->icon('heroicon-m-chart-bar-square')
+//                    ->modalContent(fn (ChannelPost $channelPost) => view('filament.stat.channel_post_stat', [
+//                        'channelPost' => $channelPost
+//                    ]))
+//                    ->modalSubmitAction(false)
+//                    ->modalCancelAction(false)
+//            ], position: ActionsPosition::BeforeColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
