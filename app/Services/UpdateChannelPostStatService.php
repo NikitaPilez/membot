@@ -27,7 +27,6 @@ class UpdateChannelPostStatService
                 if ($channelPost = $channelPosts->get($post->id)) {
                     $this->updateViewsStat($channelPost, $post);
                 }
-
             }
         }
     }
@@ -98,16 +97,10 @@ class UpdateChannelPostStatService
 
     public function updateViewsStat(ChannelPost $channelPost, ChannelPostTGStatDTO $channelPostTGStatDTO): void
     {
-        $channelPostStat = $channelPost->stat;
-
-        if (!$channelPost->stat) {
-            $channelPostStat = new ChannelPostStat();
-            $channelPostStat->channel_post_id = $channelPost->id;
-        }
-
-        $channelPostStat->views = $channelPostTGStatDTO->views;
-        $channelPostStat->shares = $channelPostTGStatDTO->shares;
-
-        $channelPostStat->save();
+        ChannelPostStat::query()->create([
+            'channel_post_id' => $channelPost->id,
+            'views' => $channelPostTGStatDTO->views,
+            'shares' => $channelPostTGStatDTO->shares,
+        ]);
     }
 }

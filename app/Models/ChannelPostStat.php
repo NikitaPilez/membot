@@ -24,8 +24,6 @@ class ChannelPostStat extends Model
         'channel_post_id',
         'views',
         'shares',
-        'views_after_twelve_hour',
-        'views_after_day',
     ];
 
     protected $casts = [
