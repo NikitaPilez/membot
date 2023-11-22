@@ -44,7 +44,7 @@ class TelegramService
             return true;
         }
 
-        Log::channel('content')->error('Видео не отправлено в телеграм канал.', $response);
+        Log::channel('content')->error('Видео не отправлено в телеграм канал.', array_merge($params, $response));
 
         return false;
     }
