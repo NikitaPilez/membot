@@ -26,10 +26,15 @@ class UpdateChannelPostStatService
             $channelPosts = ChannelPost::query()->where('channel_id', $channel->id)->get()->keyBy('post_id');
             foreach ($channelPostStats as $post) {
                 $channelPost = $channelPosts->get($post->id);
-                $statLessHourAgo = $channelPost?->stats()->where('created_at', '>', $hourAgo)->first();
 
-                if (!$statLessHourAgo) {
-                    $this->updateViewsStat($channelPost, $post);
+                if ($channelPost) {
+                    $statLessHourAgo = $channelPost->stats()->where('created_at', '>', $hourAgo)->orderByDesc('created_at')->first();
+                    $channelPostStats = $channelPost->stats;
+                    $isNeedUpdateStat =  $channelPostStats->isEmpty() || !$statLessHourAgo;
+
+                    if ($isNeedUpdateStat) {
+                        $this->updateViewsStat($channelPost, $post);
+                    }
                 }
             }
         }
