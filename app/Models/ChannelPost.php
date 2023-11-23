@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 
 /**
  * @property-read int $id
@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
  * @property Carbon $publication_at
  * @property Carbon $created_at
  * @property Channel $channel
- * @property Stat $stat
+ * @property Collection|ChannelPostStat[] $stats
  */
 class ChannelPost extends Model
 {
@@ -39,8 +39,8 @@ class ChannelPost extends Model
         return $this->belongsTo(Channel::class);
     }
 
-    public function stat(): HasOne
+    public function stats(): HasMany
     {
-        return $this->hasOne(ChannelPostStat::class);
+        return $this->hasMany(ChannelPostStat::class);
     }
 }

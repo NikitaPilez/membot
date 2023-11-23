@@ -8,7 +8,6 @@ use App\Models\ChannelPost;
 use App\Models\ChannelPostStat;
 use HeadlessChromium\BrowserFactory;
 use HeadlessChromium\Dom\Node;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class UpdateChannelPostStatService
@@ -19,12 +18,17 @@ class UpdateChannelPostStatService
             ->where('is_active', 1)
             ->get();
 
+        $hourAgo = now()->subHour();
+
         foreach ($channels as $channel) {
             $channelPostStats = $this->getChannelStat($channel);
 
             $channelPosts = ChannelPost::query()->where('channel_id', $channel->id)->get()->keyBy('post_id');
             foreach ($channelPostStats as $post) {
-                if ($channelPost = $channelPosts->get($post->id)) {
+                $channelPost = $channelPosts->get($post->id);
+                $statLessHourAgo = $channelPost?->stats()->where('created_at', '>', $hourAgo)->first();
+
+                if (!$statLessHourAgo) {
                     $this->updateViewsStat($channelPost, $post);
                 }
             }
