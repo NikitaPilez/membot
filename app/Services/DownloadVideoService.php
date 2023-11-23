@@ -46,7 +46,7 @@ class DownloadVideoService
             return;
         }
 
-        $fileName = $type . date('Y-m-d H:i') . '.mp4';
+        $fileName = $type . date('d-m-Y_H:i') . '.mp4';
 
         /** @var GoogleDriveService $googleDriveService */
         $googleDriveService = app(GoogleDriveService::class);

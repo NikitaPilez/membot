@@ -35,10 +35,6 @@ class SendVideoInTelegramService
                 'link' => $video->url,
             ]);
 
-            $fileFromDrive = $this->googleDriveService->getFileById($video->google_file_id);
-
-            $this->googleDriveService->downloadFile($fileFromDrive);
-
             $this->sendVideoInTelegram($video);
         }
     }
@@ -46,6 +42,10 @@ class SendVideoInTelegramService
     public function sendVideoInTelegram(Video $video): void
     {
         try {
+            $fileFromDrive = $this->googleDriveService->getFileById($video->google_file_id);
+
+            $this->googleDriveService->downloadFile($fileFromDrive);
+
             $result = $this->telegramService->sendVideo($video);
 
             if ($result === true) {
