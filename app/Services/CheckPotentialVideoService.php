@@ -84,23 +84,20 @@ class CheckPotentialVideoService
 
         /** @var Node $element */
         foreach ($elements as $element) {
-            $views = $element->querySelector('.tgme_widget_message_views')?->getText();
             $id = $element->querySelector('.tgme_widget_message')?->getAttribute('data-post');
             $createdAt = $element->querySelector('.tgme_widget_message_meta time')?->getAttribute('datetime');
             $description = $element->querySelector('.tgme_widget_message_text')?->getText();
 
-            if ($views && $id && $createdAt) {
+            if ($id && $createdAt) {
                 $channelPosts[] = new ChannelPostDTO(
                     id: Str::replace($channelAlias . '/', '', $id),
                     createdAt: $createdAt,
-                    views: app(ChannelPostService::class)->getHumanViews($views),
                     description: $description,
                 );
             } else {
                 Log::channel('content')->error('Не достаточно информации о посте.', [
                     'alias' => $channelAlias,
                     'id' => $id,
-                    'views' => $views,
                     'created_at' => $createdAt,
                     'description' => $description,
                 ]);

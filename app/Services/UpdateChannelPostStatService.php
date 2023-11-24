@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\DTO\ChannelPostTGStatDTO;
+use App\Helpers\TGStat;
 use App\Models\Channel;
 use App\Models\ChannelPost;
 use App\Models\ChannelPostStat;
@@ -73,7 +74,7 @@ class UpdateChannelPostStatService
             if ($views && $shares && $id) {
                 $channelPostsStat[] = new ChannelPostTGStatDTO(
                     id: $id,
-                    views: app(ChannelPostService::class)->getHumanViews($views),
+                    views: TGStat::getHumanViews($views),
                     shares: $shares,
                 );
             } else {
