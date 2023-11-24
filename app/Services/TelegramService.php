@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Models\Video;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class TelegramService
 {
@@ -31,7 +32,7 @@ class TelegramService
 
         $params = [
             'chat_id' => $video->is_prod ? config('services.telegram.chat_id_prod') : config('services.telegram.chat_id_dev'),
-            'video' => config('app.url') . '/storage/' . $video->name,
+            'video' => Storage::disk('public')->url($video->name),
             'caption' => $description,
             'parse_mode' => 'markdown'
         ];

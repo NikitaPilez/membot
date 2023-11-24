@@ -10,6 +10,7 @@ use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 
 class DownloadVideoService
@@ -97,7 +98,7 @@ class DownloadVideoService
             $image = Image::make($previewImgUrl);
             $image->encode('webp', 75);
             $fileName = date('Y-m-d H:i') . '.webp';
-            $savePath = storage_path('app/public/' . $fileName);
+            $savePath = Storage::disk('public')->path($fileName);
             $image->save($savePath);
         } catch (Exception $exception) {
             Log::channel('content')->error('Ошибка при сжатии превью к видео', [
@@ -122,7 +123,7 @@ class DownloadVideoService
     {
         try {
             $fileName = 'preview' . time() . '.png';
-            $thumbnail = storage_path('app/public/' . $fileName);
+            $thumbnail = Storage::disk('public')->path($fileName);
             $ffmpeg = FFMpeg::create();
             $video = $ffmpeg->open($videoSourceUrl);
             $frame = $video->frame(TimeCode::fromSeconds(1));

@@ -8,7 +8,6 @@ use App\Helpers\FFMpegHelper;
 use App\Models\Video;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -60,7 +59,7 @@ class SendVideoInTelegramService
                 $video->publication_date = Carbon::now();
                 $video->save();
 
-                File::delete(public_path($video->name));
+                Storage::disk('public')->delete($video->name);
             }
         } catch (Exception $exception) {
             Log::channel('content')->info('Ошибка при получении информации о файле.', [

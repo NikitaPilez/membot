@@ -10,6 +10,7 @@ use Google\Service\Drive\DriveFile;
 use Google_Client;
 use Google_Service_Drive;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class GoogleDriveService
 {
@@ -67,7 +68,7 @@ class GoogleDriveService
 
             $fileName = $file->getName();
 
-            file_put_contents(storage_path() . '/app/public/' . $fileName, $response->getBody()->getContents());
+            file_put_contents(Storage::disk('public')->path($fileName), $response->getBody()->getContents());
 
             Log::channel('content')->info('Файл загружен на сервер.', [
                 'fileId' => $file->getId(),
