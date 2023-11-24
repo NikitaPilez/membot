@@ -65,15 +65,16 @@ class GoogleDriveService
         try {
             $response = $this->service->files->get($file->getId(), ['alt' => 'media']);
 
-            $filePath = $file->getName();
+            $fileName = $file->getName();
 
-            file_put_contents(storage_path() . '/app/public/' . $filePath, $response->getBody()->getContents());
+            file_put_contents(storage_path() . '/app/public/' . $fileName, $response->getBody()->getContents());
 
             Log::channel('content')->info('Файл загружен на сервер.', [
                 'fileId' => $file->getId(),
+                'name' => $fileName,
             ]);
 
-            return $filePath;
+            return $fileName;
         } catch (Exception $exception) {
             Log::channel('content')->error('Произошла ошибка во время загрузки файла на сервер.', [
                 'fileId' => $file->getId(),

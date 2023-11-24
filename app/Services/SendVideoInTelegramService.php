@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Helpers\FFMpegHelper;
 use App\Models\Video;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class SendVideoInTelegramService
 {
@@ -44,17 +46,13 @@ class SendVideoInTelegramService
         try {
             $fileFromDrive = $this->googleDriveService->getFileById($video->google_file_id);
 
-            $filePath = $this->googleDriveService->downloadFile($fileFromDrive);
+            $fileName = $this->googleDriveService->downloadFile($fileFromDrive);
 
-            if ($this->checkIsNeedCompressVideo($filePath)) {
-                $filePathInStorage = storage_path('/app/public/' . $filePath);
-                $compressFileInStorage = storage_path('/app/public/compress_' . $filePath);
-                exec('ffmpeg -i ' . $filePathInStorage . ' -crf 18 -c:a copy ' . $compressFileInStorage);
+            if ($this->checkIsNeedCompressVideo($fileName)) {
+                FFMpegHelper::compressVideo($fileName);
             }
 
-            $videoName = $compressFileInStorage ?? $video->name;
-
-            $result = $this->telegramService->sendVideo($video, $videoName);
+            $result = $this->telegramService->sendVideo($video);
 
             if ($result === true) {
                 $video->is_sent = 1;
@@ -72,9 +70,9 @@ class SendVideoInTelegramService
         }
     }
 
-    public function checkIsNeedCompressVideo(string $filePath): bool
+    public function checkIsNeedCompressVideo(string $fileName): bool
     {
-        $contentSize = filesize(storage_path('app/public/' . $filePath));
+        $contentSize = Storage::disk('public')->size($fileName);
 
         $contentSizeMB = $contentSize / (1024 * 1024);
 
