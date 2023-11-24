@@ -60,21 +60,27 @@ class GoogleDriveService
     /**
      * @param DriveFile $file
      */
-    public function downloadFile(DriveFile $file): void
+    public function downloadFile(DriveFile $file): ?string
     {
         try {
             $response = $this->service->files->get($file->getId(), ['alt' => 'media']);
 
-            file_put_contents(storage_path() . '/app/public/' . $file->getName(), $response->getBody()->getContents());
+            $filePath = $file->getName();
+
+            file_put_contents(storage_path() . '/app/public/' . $filePath, $response->getBody()->getContents());
 
             Log::channel('content')->info('Файл загружен на сервер.', [
                 'fileId' => $file->getId(),
             ]);
+
+            return $filePath;
         } catch (Exception $exception) {
             Log::channel('content')->error('Произошла ошибка во время загрузки файла на сервер.', [
                 'fileId' => $file->getId(),
                 'message' => $exception->getMessage(),
             ]);
+
+            return null;
         }
     }
 
