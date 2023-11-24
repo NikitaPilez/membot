@@ -14,10 +14,7 @@ class UpdateChannelPostStatService
 {
     public function run(): void
     {
-        $channels = Channel::query()
-            ->where('is_active', 1)
-            ->get();
-
+        $channels = Channel::query()->where('is_active', 1)->get();
         $hourAgo = now()->subHour();
 
         foreach ($channels as $channel) {
@@ -27,14 +24,15 @@ class UpdateChannelPostStatService
             foreach ($channelPostStats as $post) {
                 $channelPost = $channelPosts->get($post->id);
 
-                if ($channelPost) {
-                    $statLessHourAgo = $channelPost->stats()->where('created_at', '>', $hourAgo)->orderByDesc('created_at')->first();
-                    $channelPostStats = $channelPost->stats;
-                    $isNeedUpdateStat =  $channelPostStats->isEmpty() || !$statLessHourAgo;
+                if (!$channelPost) {
+                    continue;
+                }
 
-                    if ($isNeedUpdateStat) {
-                        $this->updateViewsStat($channelPost, $post);
-                    }
+                $isStatLessHourAgoDoesntExist = $channelPost->stats()->where('created_at', '>', $hourAgo)->doesntExist();
+                $isNeedUpdateStat =  $isStatLessHourAgoDoesntExist || $channelPost->stats()->doesntExist();
+
+                if ($isNeedUpdateStat) {
+                    $this->updateViewsStat($channelPost, $post);
                 }
             }
         }
@@ -75,7 +73,7 @@ class UpdateChannelPostStatService
             if ($views && $shares && $id) {
                 $channelPostsStat[] = new ChannelPostTGStatDTO(
                     id: $id,
-                    views: $this->getHumanViews($views),
+                    views: app(ChannelPostService::class)->getHumanViews($views),
                     shares: $shares,
                 );
             } else {
@@ -91,17 +89,6 @@ class UpdateChannelPostStatService
         $browser->close();
 
         return $channelPostsStat;
-    }
-
-    public function getHumanViews(string $views): float|int
-    {
-        $position = strpos($views, 'k');
-
-        if ($position !== false) {
-            return (float) str_replace('k', '', $views) * 1000;
-        } else {
-            return (int) $views;
-        }
     }
 
     public function updateViewsStat(ChannelPost $channelPost, ChannelPostTGStatDTO $channelPostTGStatDTO): void
