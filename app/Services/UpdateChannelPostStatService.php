@@ -18,6 +18,7 @@ class UpdateChannelPostStatService
     {
         $channels = Channel::query()->where('is_active', 1)->get();
         $hourAgo = now()->subHour();
+        $dayAgo = now()->subDay();
 
         foreach ($channels as $channel) {
             $channelPostStats = $this->getChannelStat($channel);
@@ -27,7 +28,7 @@ class UpdateChannelPostStatService
                 /** @var ChannelPost $channelPost */
                 $channelPost = $channelPosts->get($post->id);
 
-                if (!$channelPost) {
+                if (!$channelPost || $channelPost->created_at > $dayAgo) {
                     continue;
                 }
 
