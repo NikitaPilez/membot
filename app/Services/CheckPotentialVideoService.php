@@ -93,7 +93,7 @@ class CheckPotentialVideoService
                 $channelPosts[] = new ChannelPostDTO(
                     id: Str::replace($channelAlias . '/', '', $id),
                     createdAt: $createdAt,
-                    views: $this->getHumanViews($views),
+                    views: app(ChannelPostService::class)->getHumanViews($views),
                     description: $description,
                 );
             } else {
@@ -110,16 +110,5 @@ class CheckPotentialVideoService
         $browser->close();
 
         return $channelPosts;
-    }
-
-    public function getHumanViews(string $views): float|int
-    {
-        $position = strpos($views, 'K');
-
-        if ($position !== false) {
-            return (float) str_replace('K', '', $views) * 1000;
-        } else {
-            return (int) $views;
-        }
     }
 }
