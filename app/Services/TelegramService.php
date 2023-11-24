@@ -18,7 +18,7 @@ class TelegramService
         $this->apiUrl = 'https://api.telegram.org/' . $telegramApiKey;
     }
 
-    public function sendVideo(Video $video): bool
+    public function sendVideo(Video $video, string $videoName): bool
     {
         if (config('app.env') === 'local') {
 
@@ -31,7 +31,7 @@ class TelegramService
 
         $params = [
             'chat_id' => $video->is_prod ? config('services.telegram.chat_id_prod') : config('services.telegram.chat_id_dev'),
-            'video' => config('app.url') . '/storage/' . $video->name,
+            'video' => config('app.url') . '/storage/' . $videoName,
             'caption' => $description,
             'parse_mode' => 'markdown'
         ];

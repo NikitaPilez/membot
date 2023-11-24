@@ -44,9 +44,17 @@ class SendVideoInTelegramService
         try {
             $fileFromDrive = $this->googleDriveService->getFileById($video->google_file_id);
 
-            $this->googleDriveService->downloadFile($fileFromDrive);
+            $filePath = $this->googleDriveService->downloadFile($fileFromDrive);
 
-            $result = $this->telegramService->sendVideo($video);
+            if ($this->checkIsNeedCompressVideo($filePath)) {
+                $filePathInStorage = storage_path('/app/public/' . $filePath);
+                $compressFileInStorage = storage_path('/app/public/compress_' . $filePath);
+                exec('ffmpeg -i ' . $filePathInStorage . ' -crf 18 -c:a copy ' . $compressFileInStorage);
+            }
+
+            $videoName = $compressFileInStorage ?? $video->name;
+
+            $result = $this->telegramService->sendVideo($video, $videoName);
 
             if ($result === true) {
                 $video->is_sent = 1;
@@ -62,5 +70,14 @@ class SendVideoInTelegramService
                 'videoId' => $video->id,
             ]);
         }
+    }
+
+    public function checkIsNeedCompressVideo(string $filePath): bool
+    {
+        $contentSize = filesize(storage_path('app/public/' . $filePath));
+
+        $contentSizeMB = $contentSize / (1024 * 1024);
+
+        return $contentSizeMB > 20;
     }
 }
