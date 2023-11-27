@@ -23,12 +23,17 @@ class UpdateChannelPostStatService
         foreach ($channels as $channel) {
             $channelPostStats = $this->getChannelStat($channel);
 
-            $channelPosts = ChannelPost::query()->where('channel_id', $channel->id)->get()->keyBy('post_id');
+            $channelPosts = ChannelPost::query()
+                ->where('channel_id', $channel->id)
+                ->where('publication_at', '>', $dayAgo)
+                ->get()
+                ->keyBy('post_id');
+
             foreach ($channelPostStats as $post) {
                 /** @var ChannelPost $channelPost */
                 $channelPost = $channelPosts->get($post->id);
 
-                if (!$channelPost || $channelPost->created_at > $dayAgo) {
+                if (!$channelPost) {
                     continue;
                 }
 
@@ -64,7 +69,7 @@ class UpdateChannelPostStatService
         $elements = $dom->querySelectorAll('[id^="post-"]');
 
         if (!$elements) {
-            Log::channel('content')->error('Не найдены посты.', [
+            Log::channel('content')->error('Не найдены посты для статистики.', [
                 'alias' => $channelAlias,
             ]);
         }
