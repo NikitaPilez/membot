@@ -22,14 +22,14 @@ class UpdateChannelPostStatService
             ->get();
 
         $hourAgo = now()->subHour();
-        $dayAgo = now()->subDay();
+        $oneDayOneHourAgo = now()->subHours(25);
 
         foreach ($channels as $channel) {
             $channelPostStats = $this->getChannelStat($channel);
 
             $channelPosts = ChannelPost::query()
                 ->where('channel_id', $channel->id)
-                ->where('publication_at', '>', $dayAgo)
+                ->where('publication_at', '>', $oneDayOneHourAgo)
                 ->get()
                 ->keyBy('post_id');
 
