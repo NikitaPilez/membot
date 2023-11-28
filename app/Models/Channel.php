@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
  * @property string $type
  * @property string $url
  * @property boolean $is_active
+ * @property string $tgstat_link
  * @property Carbon $created_at
  */
 class Channel extends Model
@@ -24,6 +25,7 @@ class Channel extends Model
         'type',
         'url',
         'is_active',
+        'tgstat_link',
     ];
 
     public function posts(): HasMany

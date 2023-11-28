@@ -16,7 +16,11 @@ class UpdateChannelPostStatService
 {
     public function run(): void
     {
-        $channels = Channel::query()->where('is_active', 1)->get();
+        $channels = Channel::query()
+            ->where('is_active', 1)
+            ->whereNotNull('tgstat_link')
+            ->get();
+
         $hourAgo = now()->subHour();
         $dayAgo = now()->subDay();
 
@@ -55,8 +59,6 @@ class UpdateChannelPostStatService
      */
     public function getChannelStat(Channel $channel): array
     {
-        $channelAlias = $channel->getChannelAlias();
-
         $browserFactory = new BrowserFactory();
         $browser = $browserFactory->createBrowser([
             'customFlags' => ['--disable-blink-features', '--disable-blink-features=AutomationControlled'],
@@ -64,13 +66,13 @@ class UpdateChannelPostStatService
         ]);
 
         $page = $browser->createPage();
-        $page->navigate('https://tgstat.ru/ru/channel/@' . $channelAlias)->waitForNavigation();
+        $page->navigate($channel->tgstat_link)->waitForNavigation();
         $dom = $page->dom();
         $elements = $dom->querySelectorAll('[id^="post-"]');
 
         if (!$elements) {
             Log::channel('content')->error('Не найдены посты для статистики.', [
-                'alias' => $channelAlias,
+                'channel_id' => $channel->id,
             ]);
         }
 
@@ -93,7 +95,7 @@ class UpdateChannelPostStatService
                 );
             } else {
                 Log::channel('content')->error('Не достаточно информации о посте.', [
-                    'alias' => $channelAlias,
+                    'channel_id' => $channel->id,
                     'id' => $id,
                     'views' => $views,
                     'shares' => $shares,

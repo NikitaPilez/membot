@@ -43,6 +43,11 @@ class ChannelResource extends Resource
                     ->url()
                     ->suffixIcon('heroicon-m-globe-alt')
                     ->required(),
+                Forms\Components\TextInput::make('tgstat_link')
+                    ->label('Ссылка на tgstat')
+                    ->url()
+                    ->suffixIcon('heroicon-m-globe-alt')
+                    ->required(),
                 Forms\Components\Toggle::make('is_active')
                     ->label('Активен?'),
             ]);
@@ -62,6 +67,7 @@ class ChannelResource extends Resource
                     'telegram' => 'Телеграм',
                 ]),
                 Tables\Columns\TextColumn::make('url')->label('Ссылка на канал')->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('tgstat_link')->label('Ссылка на tgstat')->sortable()->toggleable(),
                 Tables\Columns\ToggleColumn::make('is_active')->label('Активен?')->toggleable(),
             ])
             ->filters([

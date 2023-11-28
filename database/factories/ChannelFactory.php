@@ -21,6 +21,7 @@ class ChannelFactory extends Factory
             'type' => 'telegram',
             'url' => fake()->url,
             'is_active' => true,
+            'tgstat_link' => fake()->url,
             'created_at' => now(),
             'updated_at' => now(),
         ];
