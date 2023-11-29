@@ -81,24 +81,14 @@ class UpdateChannelPostStatService
 
         /** @var Node $element */
         foreach ($elements as $element) {
-            $shares = $element->querySelector('[data-original-title="Пересылок всего"]')?->getText();
-            $id = $element->querySelector('[data-original-title="Количество просмотров публикации"]')?->getAttribute('href');
-            $views = $element->querySelector('[data-original-title="Количество просмотров публикации"]')?->getText();
-            preg_match('/\/(\d+)\/stat/', $id, $matches);
-            $id = (int) $matches[1];
+            $channelPostTGStatDTO = TGStat::getChannelPostFromNode($element);
 
-            if ($views && $shares && $id) {
-                $channelPostsStat[] = new ChannelPostTGStatDTO(
-                    id: $id,
-                    views: TGStat::getHumanViews($views),
-                    shares: $shares,
-                );
+            if ($channelPostTGStatDTO->id) {
+                $channelPostsStat[] = $channelPostTGStatDTO;
             } else {
                 Log::channel('content')->error('Не достаточно информации о посте.', [
                     'channel_id' => $channel->id,
-                    'id' => $id,
-                    'views' => $views,
-                    'shares' => $shares,
+                    'channel_post_tg_stat_dto' => $channelPostTGStatDTO,
                 ]);
             }
         }

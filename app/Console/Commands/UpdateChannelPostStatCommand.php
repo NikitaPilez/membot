@@ -26,6 +26,6 @@ class UpdateChannelPostStatCommand extends Command
      */
     public function handle(): void
     {
-        UpdateChannelPostStatJob::dispatch();
+        UpdateChannelPostStatJob::dispatch()->onQueue('stats');
     }
 }
