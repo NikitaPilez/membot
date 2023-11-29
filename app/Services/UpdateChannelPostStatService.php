@@ -30,6 +30,7 @@ class UpdateChannelPostStatService
             $channelPosts = ChannelPost::query()
                 ->where('channel_id', $channel->id)
                 ->where('publication_at', '>', $oneDayOneHourAgo)
+                ->where('publication_at', '<', $hourAgo)
                 ->get()
                 ->keyBy('post_id');
 
@@ -100,10 +101,21 @@ class UpdateChannelPostStatService
 
     public function updateViewsStat(ChannelPost $channelPost, ChannelPostTGStatDTO $channelPostTGStatDTO): void
     {
+        $hourAgo = now()->subHour();
+
+        $statLessHourAgo = $channelPost->stats()->where('created_at', '>', $hourAgo)->first();
+
+        if ($statLessHourAgo) {
+            $createdAt = $statLessHourAgo->created_at;
+        } else {
+            $createdAt = Carbon::parse($channelPost->publication_at)->addHour();
+        }
+
         ChannelPostStat::query()->create([
             'channel_post_id' => $channelPost->id,
             'views' => $channelPostTGStatDTO->views,
             'shares' => $channelPostTGStatDTO->shares,
+            'created_at' => $createdAt,
         ]);
     }
 }

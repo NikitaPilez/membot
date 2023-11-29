@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
  * @property int $views
  * @property int $shares
  * @property Carbon $created_at
+ * @property ChannelPost $post
  */
 class ChannelPostStat extends Model
 {
@@ -24,6 +25,7 @@ class ChannelPostStat extends Model
         'channel_post_id',
         'views',
         'shares',
+        'created_at',
     ];
 
     protected $casts = [
@@ -31,4 +33,9 @@ class ChannelPostStat extends Model
         'shares' => 'integer',
         'views' => 'integer',
     ];
+
+    public function post(): BelongsTo
+    {
+        return $this->belongsTo(ChannelPost::class, 'channel_post_id');
+    }
 }
