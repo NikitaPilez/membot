@@ -108,7 +108,9 @@ class UpdateChannelPostStatService
         if ($statLessHourAgo) {
             $createdAt = $statLessHourAgo->created_at->addHour();
         } else {
-            $createdAt = Carbon::parse($channelPost->publication_at)->addHour();
+            $publicationDate = Carbon::parse($channelPost->publication_at);
+            $hoursDifference = now()->diffInHours($publicationDate);
+            $createdAt = $publicationDate->addHours($hoursDifference);
         }
 
         ChannelPostStat::query()->create([
