@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console;
 
+use App\Console\Commands\CalculateAveragePostStatsCommand;
 use App\Console\Commands\CheckPotentialVideos;
 use App\Console\Commands\SendVideoInTelegramCommand;
 use App\Console\Commands\UpdateChannelPostStatCommand;
@@ -22,7 +23,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command(SendVideoInTelegramCommand::class)->everyMinute();
         $schedule->command(CheckPotentialVideos::class)->everyFiveMinutes();
-        $schedule->command(UpdateChannelPostStatCommand::class)->everyMinute();
+//        $schedule->command(UpdateChannelPostStatCommand::class)->everyMinute();
+//        $schedule->command(CalculateAveragePostStatsCommand::class)->hourly();
 
         $schedule->command('telescope:prune --hours=48')->daily();
     }
