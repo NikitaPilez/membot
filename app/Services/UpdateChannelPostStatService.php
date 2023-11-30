@@ -10,6 +10,8 @@ use App\Models\ChannelPostStat;
 use Carbon\Carbon;
 use HeadlessChromium\BrowserFactory;
 use HeadlessChromium\Dom\Node;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 
 class UpdateChannelPostStatService
@@ -24,34 +26,41 @@ class UpdateChannelPostStatService
         foreach ($channels as $channel) {
             $channelPostStats = $this->getChannelStat($channel);
 
-            $channelPosts = ChannelPost::query()
-                ->where('channel_id', $channel->id)
-                ->whereBetween('publication_at', [
-                    now()->subHours(25),
-                    now()->subHour(),
-                ])
-                ->get()
-                ->keyBy('post_id');
+            /** @var Collection<int, ChannelPost> $postsNeedingStatUpdate */
+            $postsNeedingStatUpdate = $this->getPostsNeedingStatUpdate($channel);
 
             foreach ($channelPostStats as $post) {
                 /** @var ChannelPost $channelPost */
-                $channelPost = $channelPosts->get($post->id);
+                $channelPost = $postsNeedingStatUpdate->get($post->id);
 
                 if (!$channelPost) {
                     continue;
                 }
 
-                if ($this->isNeedUpdateStat($channelPost)) {
-                    $this->updateViewsStat($channelPost, $post);
-                }
+                $this->updateViewsStat($channelPost, $post);
             }
         }
     }
 
-    public function isNeedUpdateStat(ChannelPost $channelPost): bool
+    /**
+     * @param Channel $channel
+     * @return Collection<int, ChannelPost>
+     */
+    public function getPostsNeedingStatUpdate(Channel $channel): Collection
     {
-        $isStatLessHourAgoDoesntExist = $channelPost->stats()->where('created_at', '>', now()->subHour())->doesntExist();
-        return $isStatLessHourAgoDoesntExist || $channelPost->stats()->doesntExist();
+        return ChannelPost::query()
+            ->where('channel_id', $channel->id)
+            ->whereBetween('publication_at', [
+                now()->subDay()->subMinutes(5),
+                now()->subHour(),
+            ])
+            ->where(function (Builder $query) {
+                $query->whereDoesntHave('stats', function ($subQuery) {
+                    $subQuery->where('created_at', '>', now()->subHour());
+                })->orWhereDoesntHave('stats');
+            })
+            ->get()
+            ->keyBy('post_id');
     }
 
     /**
