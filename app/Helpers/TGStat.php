@@ -13,13 +13,13 @@ class TGStat
     {
         preg_match('/([\d.]+)k?/', $string, $matches);
 
-        $number = $matches[1];
+        $number = $matches[1] ?? 0;
 
-        if ($number) {
-            return (int) $number != $number ? (int) ($number * 1000) : (int) $number;
+        if (str_contains($string, 'k')) {
+            return $number * 1000;
+        } else {
+            return $number;
         }
-
-        return 0;
     }
 
     public static function getChannelPostFromNode(Node $element): ChannelPostTGStatDTO

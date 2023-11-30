@@ -30,7 +30,7 @@ class UpdateChannelPostStatTest extends TestCase
         $this->assertCount(1, $postNeedingStatUpdate);
     }
 
-    public function test_get_posts_needing_stat_update_publication_half_hour_ago()
+    public function test_get_posts_not_needing_stat_update_publication_half_hour_ago()
     {
         $channel = Channel::factory()->create();
         ChannelPost::factory()->create([
@@ -46,7 +46,7 @@ class UpdateChannelPostStatTest extends TestCase
         $this->assertCount(0, $postNeedingStatUpdate);
     }
 
-    public function test_get_posts_needing_stat_update_publication_one_day_one_hour_ago()
+    public function test_get_posts_not_needing_stat_update_publication_one_day_one_hour_ago()
     {
         $channel = Channel::factory()->create();
         ChannelPost::factory()->create([
@@ -62,7 +62,7 @@ class UpdateChannelPostStatTest extends TestCase
         $this->assertCount(0, $postNeedingStatUpdate);
     }
 
-    public function test_get_posts_needing_stat_update_publication_last_stat_less_hour_ago()
+    public function test_get_posts_not_needing_stat_update_publication_last_stat_less_hour_ago()
     {
         $channel = Channel::factory()->create();
 
