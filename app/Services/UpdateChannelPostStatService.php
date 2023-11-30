@@ -28,7 +28,7 @@ class UpdateChannelPostStatService
                 ->where('channel_id', $channel->id)
                 ->whereBetween('publication_at', [
                     now()->subHours(25),
-                    now()->addHour(),
+                    now()->subHour(),
                 ])
                 ->get()
                 ->keyBy('post_id');
