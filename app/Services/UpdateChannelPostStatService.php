@@ -21,16 +21,15 @@ class UpdateChannelPostStatService
             ->whereNotNull('tgstat_link')
             ->get();
 
-        $hourAgo = now()->subHour();
-        $oneDayOneHourAgo = now()->subHours(25);
-
         foreach ($channels as $channel) {
             $channelPostStats = $this->getChannelStat($channel);
 
             $channelPosts = ChannelPost::query()
                 ->where('channel_id', $channel->id)
-                ->where('publication_at', '>', $oneDayOneHourAgo)
-                ->where('publication_at', '<', $hourAgo)
+                ->whereBetween('publication_at', [
+                    now()->subHours(25),
+                    now()->addHour(),
+                ])
                 ->get()
                 ->keyBy('post_id');
 
@@ -42,16 +41,16 @@ class UpdateChannelPostStatService
                     continue;
                 }
 
-                if ($this->isNeedUpdateStat($channelPost, $hourAgo)) {
+                if ($this->isNeedUpdateStat($channelPost)) {
                     $this->updateViewsStat($channelPost, $post);
                 }
             }
         }
     }
 
-    public function isNeedUpdateStat(ChannelPost $channelPost, Carbon $hourAgo): bool
+    public function isNeedUpdateStat(ChannelPost $channelPost): bool
     {
-        $isStatLessHourAgoDoesntExist = $channelPost->stats()->where('created_at', '>', $hourAgo)->doesntExist();
+        $isStatLessHourAgoDoesntExist = $channelPost->stats()->where('created_at', '>', now()->subHour())->doesntExist();
         return $isStatLessHourAgoDoesntExist || $channelPost->stats()->doesntExist();
     }
 
@@ -103,6 +102,7 @@ class UpdateChannelPostStatService
     {
         $hourAgo = now()->subHour();
 
+        /** @var ChannelPostStat $statLessHourAgo */
         $statLessHourAgo = $channelPost->stats()->where('created_at', '>', $hourAgo)->first();
 
         if ($statLessHourAgo) {

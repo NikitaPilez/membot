@@ -22,21 +22,21 @@ class UpdateChannelPostStatTest extends TestCase
         /** @var UpdateChannelPostStatService $service */
         $service = app(UpdateChannelPostStatService::class);
 
-        $isNeedUpdateStat = $service->isNeedUpdateStat($channelPost, now()->subHour());
+        $isNeedUpdateStat = $service->isNeedUpdateStat($channelPost);
         $this->assertTrue($isNeedUpdateStat);
 
         ChannelPostStat::factory()->create([
             'created_at' => now()->subHour()->subMinutes(5),
         ]);
 
-        $isNeedUpdateStat = $service->isNeedUpdateStat($channelPost, now()->subHour());
+        $isNeedUpdateStat = $service->isNeedUpdateStat($channelPost);
         $this->assertTrue($isNeedUpdateStat);
 
         ChannelPostStat::factory()->create([
             'created_at' => now()->subMinutes(30),
         ]);
 
-        $isNeedUpdateStat = $service->isNeedUpdateStat($channelPost, now()->subHour());
+        $isNeedUpdateStat = $service->isNeedUpdateStat($channelPost);
         $this->assertFalse($isNeedUpdateStat);
     }
 }
