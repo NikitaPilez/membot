@@ -21,23 +21,19 @@ class UpdateChannelPostStatService
         $channels = Channel::query()
             ->where('is_active', 1)
             ->whereNotNull('tgstat_link')
+            ->has('posts')
             ->get();
 
         foreach ($channels as $channel) {
             $channelPostStats = $this->getChannelStat($channel);
 
-            /** @var Collection<int, ChannelPost> $postsNeedingStatUpdate */
-            $postsNeedingStatUpdate = $this->getPostsNeedingStatUpdate($channel);
+            /** @var Collection<int, ChannelPost> $channelPosts */
+            $channelPosts = $this->getPostsNeedingStatUpdate($channel, $channelPostStats);
 
-            foreach ($channelPostStats as $post) {
-                /** @var ChannelPost $channelPost */
-                $channelPost = $postsNeedingStatUpdate->get($post->id);
+            foreach ($channelPosts as $channelPost) {
+                $channelPostStatKey = array_search($channelPost->id, array_column($channelPostStats, 'id'));
 
-                if (!$channelPost) {
-                    continue;
-                }
-
-                $this->updateViewsStat($channelPost, $post);
+                $this->updateViewsStat($channelPost, $channelPostStats[$channelPostStatKey]);
             }
         }
     }
@@ -46,7 +42,7 @@ class UpdateChannelPostStatService
      * @param Channel $channel
      * @return Collection<int, ChannelPost>
      */
-    public function getPostsNeedingStatUpdate(Channel $channel): Collection
+    public function getPostsNeedingStatUpdate(Channel $channel, ?array $channelPostStats): Collection
     {
         return ChannelPost::query()
             ->where('channel_id', $channel->id)
@@ -59,8 +55,9 @@ class UpdateChannelPostStatService
                     $subQuery->where('created_at', '>', now()->subHour());
                 })->orWhereDoesntHave('stats');
             })
+            ->whereIn('id', array_column($channelPostStats, 'id'))
             ->get()
-            ->keyBy('post_id');
+        ;
     }
 
     /**

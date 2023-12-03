@@ -14,7 +14,7 @@ class CalculateAveragePostStatsService
 {
     public function run(): void
     {
-        $channels = Channel::query()->where('is_active', 1)->get();
+        $channels = Channel::query()->where('is_active', 1)->has('posts')->get();
 
         foreach ($channels as $channel) {
             $this->saveChannelAverageStat($this->getAverageStatByChannel($channel), $channel->id);
