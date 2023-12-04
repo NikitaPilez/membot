@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\UpdateChannelPostStat;
 
 use App\Models\Channel;
 use App\Models\ChannelPost;
@@ -10,11 +10,11 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class UpdateChannelPostStatTest extends TestCase
+class GetPostsNeedingStatUpdateTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_get_posts_needing_stat_update_publication_hour_ago()
+    public function test_publication_hour_ago()
     {
         $channel = Channel::factory()->create();
         $channelPost = ChannelPost::factory()->create([
@@ -30,7 +30,7 @@ class UpdateChannelPostStatTest extends TestCase
         $this->assertCount(1, $postNeedingStatUpdate);
     }
 
-    public function test_get_posts_not_needing_stat_update_publication_half_hour_ago()
+    public function test_publication_half_hour_ago()
     {
         $channel = Channel::factory()->create();
         $channelPost = ChannelPost::factory()->create([
@@ -46,7 +46,7 @@ class UpdateChannelPostStatTest extends TestCase
         $this->assertCount(0, $postNeedingStatUpdate);
     }
 
-    public function test_get_posts_not_needing_stat_update_publication_one_day_one_hour_ago()
+    public function test_publication_one_day_one_hour_ago()
     {
         $channel = Channel::factory()->create();
         $channelPost = ChannelPost::factory()->create([
@@ -62,7 +62,7 @@ class UpdateChannelPostStatTest extends TestCase
         $this->assertCount(0, $postNeedingStatUpdate);
     }
 
-    public function test_get_posts_not_needing_stat_update_publication_last_stat_less_hour_ago()
+    public function test_publication_last_stat_less_hour_ago()
     {
         $channel = Channel::factory()->create();
 
@@ -84,7 +84,7 @@ class UpdateChannelPostStatTest extends TestCase
         $this->assertCount(0, $postNeedingStatUpdate);
     }
 
-    public function test_get_posts_needing_stat_update_publication_last_stat_more_hour_ago()
+    public function test_publication_last_stat_more_hour_ago()
     {
         $channel = Channel::factory()->create();
 
