@@ -55,7 +55,7 @@ class UpdateChannelPostStatService
                     $subQuery->where('created_at', '>', now()->subHour());
                 })->orWhereDoesntHave('stats');
             })
-            ->whereIn('id', array_column($channelPostStats, 'id'))
+            ->whereIn('post_id', array_column($channelPostStats, 'id'))
             ->get()
         ;
     }
