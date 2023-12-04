@@ -25,15 +25,16 @@ class UpdateChannelPostStatService
             ->get();
 
         foreach ($channels as $channel) {
-            $channelPostStats = $this->getChannelStat($channel);
+            $channelPostStats = $this->getChannelStatFromTgStat($channel);
 
-            /** @var Collection<int, ChannelPost> $channelPosts */
-            $channelPosts = $this->getPostsNeedingStatUpdate($channel, $channelPostStats);
+            $postIdsForUpdating = array_column($channelPostStats, 'id');
 
-            foreach ($channelPosts as $channelPost) {
-                $channelPostStatKey = array_search($channelPost->id, array_column($channelPostStats, 'id'));
+            /** @var Collection<int, ChannelPost> $postsNeedingStatUpdate */
+            $postsNeedingStatUpdate = $this->getPostsNeedingStatUpdate($channel, $postIdsForUpdating);
 
-                $this->updateViewsStat($channelPost, $channelPostStats[$channelPostStatKey]);
+            foreach ($channelPostStats as $channelPostStat) {
+                $channelPost = $postsNeedingStatUpdate->get($channelPostStat->id);
+                $this->updateViewsStat($channelPost, $channelPostStat);
             }
         }
     }
@@ -42,7 +43,7 @@ class UpdateChannelPostStatService
      * @param Channel $channel
      * @return Collection<int, ChannelPost>
      */
-    public function getPostsNeedingStatUpdate(Channel $channel, ?array $channelPostStats): Collection
+    public function getPostsNeedingStatUpdate(Channel $channel, ?array $postIdsForUpdating): Collection
     {
         return ChannelPost::query()
             ->where('channel_id', $channel->id)
@@ -55,15 +56,15 @@ class UpdateChannelPostStatService
                     $subQuery->where('created_at', '>', now()->subHour());
                 })->orWhereDoesntHave('stats');
             })
-            ->whereIn('post_id', array_column($channelPostStats, 'id'))
+            ->whereIn('post_id', $postIdsForUpdating)
             ->get()
-        ;
+            ->keyBy('post_id');
     }
 
     /**
      * @return array<ChannelPostTGStatDTO>
      */
-    public function getChannelStat(Channel $channel): array
+    public function getChannelStatFromTgStat(Channel $channel): array
     {
         $browserFactory = new BrowserFactory();
         $browser = $browserFactory->createBrowser([
