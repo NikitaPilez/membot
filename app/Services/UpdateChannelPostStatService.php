@@ -36,7 +36,7 @@ class UpdateChannelPostStatService
                 $channelPost = $postsNeedingStatUpdate->get($channelPostStat->id);
 
                 if (!$channelPost) {
-                    return;
+                    continue;
                 }
 
                 $this->updateViewsStat($channelPost, $channelPostStat);
