@@ -25,14 +25,14 @@ class UpdateChannelPostStatService
             ->get();
 
         foreach ($channels as $channel) {
-            $channelPostStats = $this->getChannelStatFromTgStat($channel);
+            $channelPostStatsFromTG = $this->getChannelStatFromTgStat($channel);
 
-            $postIdsForUpdating = array_column($channelPostStats, 'id');
+            $postIdsForUpdating = array_column($channelPostStatsFromTG, 'id');
 
             /** @var Collection<int, ChannelPost> $postsNeedingStatUpdate */
             $postsNeedingStatUpdate = $this->getPostsNeedingStatUpdate($channel, $postIdsForUpdating);
 
-            foreach ($channelPostStats as $channelPostStat) {
+            foreach ($channelPostStatsFromTG as $channelPostStat) {
                 $channelPost = $postsNeedingStatUpdate->get($channelPostStat->id);
                 $this->updateViewsStat($channelPost, $channelPostStat);
             }

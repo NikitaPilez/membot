@@ -17,7 +17,7 @@ class UpdateChannelPostStatTest extends TestCase
     public function test_get_posts_needing_stat_update_publication_hour_ago()
     {
         $channel = Channel::factory()->create();
-        ChannelPost::factory()->create([
+        $channelPost = ChannelPost::factory()->create([
             'channel_id' => $channel->id,
             'publication_at' => now()->subHour(),
         ]);
@@ -26,14 +26,14 @@ class UpdateChannelPostStatTest extends TestCase
         $service = app(UpdateChannelPostStatService::class);
 
         /** @var Collection<int, ChannelPost> $postNeedingStatUpdate */
-        $postNeedingStatUpdate = $service->getPostsNeedingStatUpdate($channel);
+        $postNeedingStatUpdate = $service->getPostsNeedingStatUpdate($channel, (array) $channelPost->post_id);
         $this->assertCount(1, $postNeedingStatUpdate);
     }
 
     public function test_get_posts_not_needing_stat_update_publication_half_hour_ago()
     {
         $channel = Channel::factory()->create();
-        ChannelPost::factory()->create([
+        $channelPost = ChannelPost::factory()->create([
             'channel_id' => $channel->id,
             'publication_at' => now()->subMinutes(30),
         ]);
@@ -42,14 +42,14 @@ class UpdateChannelPostStatTest extends TestCase
         $service = app(UpdateChannelPostStatService::class);
 
         /** @var Collection<int, ChannelPost> $postNeedingStatUpdate */
-        $postNeedingStatUpdate = $service->getPostsNeedingStatUpdate($channel);
+        $postNeedingStatUpdate = $service->getPostsNeedingStatUpdate($channel, (array) $channelPost->post_id);
         $this->assertCount(0, $postNeedingStatUpdate);
     }
 
     public function test_get_posts_not_needing_stat_update_publication_one_day_one_hour_ago()
     {
         $channel = Channel::factory()->create();
-        ChannelPost::factory()->create([
+        $channelPost = ChannelPost::factory()->create([
             'channel_id' => $channel->id,
             'publication_at' => now()->subHours(25),
         ]);
@@ -58,7 +58,7 @@ class UpdateChannelPostStatTest extends TestCase
         $service = app(UpdateChannelPostStatService::class);
 
         /** @var Collection<int, ChannelPost> $postNeedingStatUpdate */
-        $postNeedingStatUpdate = $service->getPostsNeedingStatUpdate($channel);
+        $postNeedingStatUpdate = $service->getPostsNeedingStatUpdate($channel, (array) $channelPost->post_id);
         $this->assertCount(0, $postNeedingStatUpdate);
     }
 
@@ -80,7 +80,7 @@ class UpdateChannelPostStatTest extends TestCase
         $service = app(UpdateChannelPostStatService::class);
 
         /** @var Collection<int, ChannelPost> $postNeedingStatUpdate */
-        $postNeedingStatUpdate = $service->getPostsNeedingStatUpdate($channel);
+        $postNeedingStatUpdate = $service->getPostsNeedingStatUpdate($channel, (array) $channelPost->post_id);
         $this->assertCount(0, $postNeedingStatUpdate);
     }
 
@@ -102,7 +102,7 @@ class UpdateChannelPostStatTest extends TestCase
         $service = app(UpdateChannelPostStatService::class);
 
         /** @var Collection<int, ChannelPost> $postNeedingStatUpdate */
-        $postNeedingStatUpdate = $service->getPostsNeedingStatUpdate($channel);
+        $postNeedingStatUpdate = $service->getPostsNeedingStatUpdate($channel, (array) $channelPost->post_id);
         $this->assertCount(1, $postNeedingStatUpdate);
     }
 }
