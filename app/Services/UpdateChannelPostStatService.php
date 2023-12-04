@@ -34,6 +34,11 @@ class UpdateChannelPostStatService
 
             foreach ($channelPostStatsFromTG as $channelPostStat) {
                 $channelPost = $postsNeedingStatUpdate->get($channelPostStat->id);
+
+                if (!$channelPost) {
+                    return;
+                }
+
                 $this->updateViewsStat($channelPost, $channelPostStat);
             }
         }
