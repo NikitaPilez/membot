@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\DTO\ChannelPostTGStatDTO;
+use App\Events\CreatePostStatEvent;
 use App\Helpers\TGStat;
 use App\Models\Channel;
 use App\Models\ChannelPost;
@@ -125,11 +126,13 @@ class UpdateChannelPostStatService
             $createdAt = $publicationDate->addHours($hoursDifference);
         }
 
-        ChannelPostStat::query()->create([
+        $channelPostStat = ChannelPostStat::query()->create([
             'channel_post_id' => $channelPost->id,
             'views' => $channelPostTGStatDTO->views,
             'shares' => $channelPostTGStatDTO->shares,
             'created_at' => $createdAt,
         ]);
+
+        CreatePostStatEvent::dispatch($channelPostStat);
     }
 }
