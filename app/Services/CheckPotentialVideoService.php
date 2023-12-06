@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use App\DTO\ChannelPostDTO;
+use App\Helpers\CheckPotentialVideo\CheckPotentialVideoFromTelegram;
+use App\Helpers\CheckPotentialVideo\CheckPotentialVideoFromYoutube;
+use App\Helpers\CheckPotentialVideo\CheckPotentialVideoInterface;
 use App\Helpers\TGStat;
 use App\Models\Channel;
 use App\Models\ChannelPost;
@@ -17,18 +20,28 @@ class CheckPotentialVideoService
     {
         $channels =  Channel::query()
             ->where('is_active', 1)
-            ->whereNotNull('tgstat_link')
             ->get();
 
         foreach ($channels as $channel) {
-            $this->check($channel);
+            $checkPotentialVideoHandler = $this->getPotentialVideoHelper($channel);
+
+            if ($checkPotentialVideoHandler) {
+                /** @var ChannelPostDTO[] $parsedChannelPosts */
+                $parsedChannelPosts = $checkPotentialVideoHandler->getChannelPosts($channel);
+                $this->createNewChannelPosts($channel, $parsedChannelPosts);
+            }
         }
     }
 
-    public function check(Channel $channel): void
+    public function getPotentialVideoHelper(Channel $channel): ?CheckPotentialVideoInterface
     {
-        $parsedChannelPosts = $this->getChannelPosts($channel);
-        $this->createNewChannelPosts($channel, $parsedChannelPosts);
+        if ($channel->type === 'telegram') {
+            return new CheckPotentialVideoFromTelegram();
+        } else if ($channel->type === 'youtube') {
+            return new CheckPotentialVideoFromYoutube();
+        }
+
+        return null;
     }
 
     public function createNewChannelPosts(Channel $channel, array $parsedChannelPosts): void
@@ -45,6 +58,7 @@ class CheckPotentialVideoService
                     'channel_id' => $channel->id,
                     'post_id' => $parsedChannelPost->id,
                     'description' => $parsedChannelPost->description,
+                    'image' => $parsedChannelPost->image,
                     'publication_at' => $parsedChannelPost->createdAt,
                 ]);
 
@@ -53,50 +67,5 @@ class CheckPotentialVideoService
                 ]);
             }
         }
-    }
-
-    /**
-     * @return array<ChannelPostDTO>
-     */
-    public function getChannelPosts(Channel $channel): array
-    {
-        $browserFactory = new BrowserFactory();
-        $browser = $browserFactory->createBrowser([
-            'customFlags' => ['--disable-blink-features', '--disable-blink-features=AutomationControlled'],
-            'sendSyncDefaultTimeout' => 10000,
-        ]);
-
-        $page = $browser->createPage();
-        $page->navigate($channel->tgstat_link)->waitForNavigation();
-
-        $dom = $page->dom();
-        $elements = $dom->querySelectorAll('[id^="post-"]');
-
-        if (!$elements) {
-            Log::channel('content')->error('Не найдены посты.', [
-                'channel_id' => $channel->id,
-            ]);
-        }
-
-        /** @var ChannelPostDTO[] $channelPosts */
-        $channelPosts = [];
-
-        /** @var Node $element */
-        foreach ($elements as $element) {
-            $channelPostTGStatDTO = TGStat::getChannelPostFromNode($element);
-
-            if ($channelPostTGStatDTO->id && $channelPostTGStatDTO->createdAt) {
-                $channelPosts[] = $channelPostTGStatDTO;
-            } else {
-                Log::channel('content')->error('Не достаточно информации о посте.', [
-                    'channel_id' => $channel->id,
-                    'channel_post_tg_stat_dto' => $channelPostTGStatDTO,
-                ]);
-            }
-        }
-
-        $browser->close();
-
-        return $channelPosts;
     }
 }

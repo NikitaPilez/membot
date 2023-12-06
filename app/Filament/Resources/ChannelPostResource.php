@@ -58,6 +58,11 @@ class ChannelPostResource extends Resource
                 Tables\Columns\TextColumn::make('channel.name')
                     ->toggleable()
                     ->label('Имя канала'),
+                Tables\Columns\ImageColumn::make('image')
+                    ->toggleable()
+                    ->label('Изображение')
+                    ->width(150)
+                    ->height(150),
                 Tables\Columns\TextColumn::make('post_id')
                     ->toggleable()
                     ->label('ID поста'),

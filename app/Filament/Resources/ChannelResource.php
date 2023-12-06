@@ -37,6 +37,7 @@ class ChannelResource extends Resource
                     ->required()
                     ->options([
                         'telegram' => 'Телеграм',
+                        'youtube' => 'Ютуб',
                     ]),
                 Forms\Components\TextInput::make('url')
                     ->label('Ссылка на канал')
@@ -46,8 +47,7 @@ class ChannelResource extends Resource
                 Forms\Components\TextInput::make('tgstat_link')
                     ->label('Ссылка на tgstat')
                     ->url()
-                    ->suffixIcon('heroicon-m-globe-alt')
-                    ->required(),
+                    ->suffixIcon('heroicon-m-globe-alt'),
                 Forms\Components\Toggle::make('is_active')
                     ->label('Активен?'),
             ]);
@@ -65,6 +65,7 @@ class ChannelResource extends Resource
                     ->rules(['required'])
                     ->options([
                     'telegram' => 'Телеграм',
+                    'youtube' => 'Ютуб',
                 ]),
                 Tables\Columns\TextColumn::make('url')->label('Ссылка на канал')->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('tgstat_link')->label('Ссылка на tgstat')->sortable()->toggleable(),
@@ -74,6 +75,7 @@ class ChannelResource extends Resource
                 Tables\Filters\SelectFilter::make('type')->label('Социальная сеть')
                     ->options([
                         'telegram' => 'Телеграм',
+                        'youtube' => 'Ютуб',
                     ]),
             ])
             ->actions([
