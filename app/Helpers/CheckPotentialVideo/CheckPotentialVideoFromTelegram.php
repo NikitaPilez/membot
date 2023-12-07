@@ -15,6 +15,10 @@ class CheckPotentialVideoFromTelegram implements CheckPotentialVideoInterface
 {
     public function getChannelPosts(Channel $channel): array
     {
+        if (!$channel->parse_new_video_link) {
+            return [];
+        }
+
         $browserFactory = new BrowserFactory();
         $browser = $browserFactory->createBrowser([
             'customFlags' => [
