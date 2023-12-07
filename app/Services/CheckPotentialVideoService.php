@@ -20,6 +20,7 @@ class CheckPotentialVideoService
     {
         $channels =  Channel::query()
             ->where('is_active', 1)
+            ->whereNotNull('parse_new_video_link')
             ->get();
 
         foreach ($channels as $channel) {

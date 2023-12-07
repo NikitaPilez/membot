@@ -26,11 +26,7 @@ class CheckPotentialVideoFromTelegram implements CheckPotentialVideoInterface
 
         $page = $browser->createPage();
 
-        if (!$channel->tgstat_link) {
-            return [];
-        }
-
-        $page->navigate($channel->tgstat_link)->waitForNavigation();
+        $page->navigate($channel->parse_new_video_link)->waitForNavigation();
 
         $dom = $page->dom();
         $elements = $dom->querySelectorAll('[id^="post-"]');
