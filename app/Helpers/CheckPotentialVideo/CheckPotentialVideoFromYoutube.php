@@ -22,6 +22,8 @@ class CheckPotentialVideoFromYoutube implements CheckPotentialVideoInterface
         $page = $browser->createPage();
         $page->navigate($channel->parse_new_video_link)->waitForNavigation();
 
+        sleep(1);
+
         $dom = $page->dom();
         $elements = $dom->querySelectorAll('.ytd-rich-item-renderer');
 
