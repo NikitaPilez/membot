@@ -32,7 +32,7 @@ class CheckPotentialVideoFromYoutube implements CheckPotentialVideoInterface
                 'channel_id' => $channel->id,
             ]);
 
-            file_put_contents($page->getHtml(), 'test.txt');
+            file_put_contents('test.txt', $page->getHtml());
         }
 
         /** @var ChannelPostDTO[] $channelPosts */
