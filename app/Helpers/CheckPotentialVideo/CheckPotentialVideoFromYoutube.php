@@ -23,12 +23,11 @@ class CheckPotentialVideoFromYoutube implements CheckPotentialVideoInterface
         $page->navigate($channel->parse_new_video_link)->waitForNavigation();
 
         $dom = $page->dom();
-        $elements = $dom->querySelectorAll('ytd-rich-item-renderer');
+        $elements = $dom->querySelectorAll('.ytd-rich-item-renderer');
 
         if (!$elements) {
             Log::channel('content')->error('Не найдены посты.', [
                 'channel_id' => $channel->id,
-                'html' => $page->getHtml(),
             ]);
         }
 
