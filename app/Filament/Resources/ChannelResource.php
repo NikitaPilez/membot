@@ -48,6 +48,8 @@ class ChannelResource extends Resource
                     ->label('Ссылка, откуда брать контент')
                     ->url()
                     ->suffixIcon('heroicon-m-globe-alt'),
+                Forms\Components\TextInput::make('youtube_id')
+                    ->label('ID ютуб канала'),
                 Forms\Components\TextInput::make('tgstat_link')
                     ->label('Ссылка на tgstat')
                     ->url()
@@ -74,6 +76,7 @@ class ChannelResource extends Resource
                 Tables\Columns\TextColumn::make('url')->label('Ссылка на канал')->toggleable(),
                 Tables\Columns\ToggleColumn::make('is_active')->label('Активен?')->toggleable(),
                 Tables\Columns\TextColumn::make('parse_new_video_link')->label('Ссылка, откуда брать контент')->toggleable(),
+                Tables\Columns\TextColumn::make('youtube_id')->label('ID ютуб канала')->toggleable(),
                 Tables\Columns\TextColumn::make('tgstat_link')->label('Ссылка на tgstat')->toggleable(),
             ])
             ->filters([
