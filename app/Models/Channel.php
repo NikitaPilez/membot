@@ -31,4 +31,9 @@ class Channel extends Model
         'is_active',
         'tgstat_link',
     ];
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(ChannelPost::class);
+    }
 }
