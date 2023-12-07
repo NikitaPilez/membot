@@ -43,5 +43,9 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'refresh_token' => env('GOOGLE_REFRESH_TOKEN'),
         'mem_video_folder_id' => env('GOOGLE_MEM_VIDEO_FOLDER_ID'),
-    ]
+    ],
+
+    'youtube' => [
+        'api_key' => env('YOUTUBE_API_KEY'),
+    ],
 ];

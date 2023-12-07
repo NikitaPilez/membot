@@ -4,8 +4,8 @@ namespace App\Helpers\CheckPotentialVideo;
 
 use App\DTO\ChannelPostDTO;
 use App\Models\Channel;
-use HeadlessChromium\BrowserFactory;
-use HeadlessChromium\Dom\Node;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class CheckPotentialVideoFromYoutube implements CheckPotentialVideoInterface
@@ -13,57 +13,54 @@ class CheckPotentialVideoFromYoutube implements CheckPotentialVideoInterface
 
     public function getChannelPosts(Channel $channel): array
     {
-        $browserFactory = new BrowserFactory();
-        $browser = $browserFactory->createBrowser([
-            'customFlags' => ['--disable-blink-features', '--disable-blink-features=AutomationControlled'],
-            'sendSyncDefaultTimeout' => 10000,
-        ]);
-
-        $page = $browser->createPage();
-        $page->navigate($channel->parse_new_video_link)->waitForNavigation();
-
-        sleep(1);
-
-        $dom = $page->dom();
-        $elements = $dom->querySelectorAll('.ytd-rich-item-renderer');
-
-        if (!$elements) {
-            Log::channel('content')->error('Не найдены посты.', [
-                'channel_id' => $channel->id,
-            ]);
-
-            file_put_contents('test.txt', $page->getHtml());
+        if (!$channel->youtube_id) {
+            return [];
         }
 
-        /** @var ChannelPostDTO[] $channelPosts */
         $channelPosts = [];
 
-        /** @var Node $element */
-        foreach ($elements as $element) {
-            $description = $element->querySelector('#details span')?->getText();
-            $image = $element->querySelector('#thumbnail img')?->getAttribute('src');
-            $shortUrl = $element->querySelector('#thumbnail')?->getAttribute('href');
-            $hash = hash_hmac('sha256', $shortUrl, '1');
-            $id = (int) fmod(hexdec($hash), 10000) + 1;
+        $response = Http::get('https://www.googleapis.com/youtube/v3/search', [
+            'key' => config('services.youtube.api_key'),
+            'videoDuration' => 'short',
+            'type' => 'video',
+            'order' => 'date',
+            'maxResults' => 10,
+            'channelId' => $channel->youtube_id,
+            'part' => 'snippet',
+        ]);
 
-            if ($description && $id) {
-                $channelPosts[] = new ChannelPostDTO(
-                    id: $id,
-                    createdAt: now(),
-                    description: $description,
-                    image: $image,
-                );
-            } else {
-                Log::channel('content')->error('Не достаточно информации о посте.', [
-                    'channel_id' => $channel->id,
-                    'channel_post_id' => $id,
-                    'channel_post_description' => $description,
-                    'channel_post_image' => $image,
-                ]);
-            }
+        if ($response->successful()) {
+            $channelPosts = $this->transformResponseToPost($response->json());
+        } else {
+            Log::channel('content')->error('Не удалось получить контент по каналу.', [
+                'channel_id' => $channel->id,
+            ]);
         }
 
-        $browser->close();
+        return $channelPosts;
+    }
+
+    public function transformResponseToPost(array $response): array
+    {
+        $channelPosts = [];
+        if ($items = $response['items'] ?? null) {
+            foreach ($items as $item) {
+                $description = $item['snippet']['title'] ?? null;
+                $stringId = $item['id']['videoId'] ?? null;
+                $createdAt = $item['snippet']['publishedAt'] ?? null;
+                $image = $item['snippet']['thumbnails']['high']['url'] ?? null;
+
+                $hash = hash_hmac('sha256', $stringId, '1');
+                $id = (int) fmod(hexdec($hash), 10000) + 1;
+
+                $channelPosts[] = new ChannelPostDTO(
+                    id: $id,
+                    createdAt: Carbon::parse($createdAt),
+                    description: $description,
+                    image: $image
+                );
+            }
+        }
 
         return $channelPosts;
     }

@@ -47,9 +47,7 @@ class CheckPotentialVideoService
 
     public function createNewChannelPosts(Channel $channel, array $parsedChannelPosts): void
     {
-        $existsPostIds = Cache::remember('exists-post-ids-' . $channel->id, 60, function () use ($channel) {
-            return ChannelPost::query()->where('channel_id', $channel->id)->pluck('post_id')->toArray();
-        });
+        $existsPostIds =  ChannelPost::query()->where('channel_id', $channel->id)->pluck('post_id')->toArray();
 
         /** @var ChannelPostDTO $parsedChannelPost */
         foreach ($parsedChannelPosts as $parsedChannelPost) {
