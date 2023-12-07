@@ -31,6 +31,8 @@ class CheckPotentialVideoFromYoutube implements CheckPotentialVideoInterface
             Log::channel('content')->error('Не найдены посты.', [
                 'channel_id' => $channel->id,
             ]);
+
+            file_put_contents($page->getHtml(), 'test.txt');
         }
 
         /** @var ChannelPostDTO[] $channelPosts */
