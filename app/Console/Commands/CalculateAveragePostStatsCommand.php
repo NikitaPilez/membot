@@ -26,6 +26,6 @@ class CalculateAveragePostStatsCommand extends Command
      */
     public function handle(): void
     {
-        CalculateAveragePostStatsJob::dispatch();
+        CalculateAveragePostStatsJob::dispatch()->onQueue('stat');
     }
 }

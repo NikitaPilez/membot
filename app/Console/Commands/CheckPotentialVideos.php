@@ -27,6 +27,6 @@ class CheckPotentialVideos extends Command
      */
     public function handle(): void
     {
-        CheckPotentialVideoJob::dispatch();
+        CheckPotentialVideoJob::dispatch()->onQueue('content');
     }
 }

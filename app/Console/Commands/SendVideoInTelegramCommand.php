@@ -15,6 +15,6 @@ class SendVideoInTelegramCommand extends Command
 
     public function handle(): void
     {
-        SendVideoInTelegramJob::dispatch();
+        SendVideoInTelegramJob::dispatch()->onQueue('content');
     }
 }

@@ -28,7 +28,7 @@ class VideoController
             $url = config('app.url') . Storage::url('public/' . $uploadedFile->getClientOriginalName());
         }
 
-        DownloadVideoJob::dispatch($url, $type, $isProd, $description, $comment);
+        DownloadVideoJob::dispatch($url, $type, $isProd, $description, $comment)->onQueue('content');
 
         return back();
     }
