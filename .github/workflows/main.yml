@@ -36,4 +36,4 @@ jobs:
 
       - name: Execute command via ssh
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.SSH_SOURCE_DIR }} && php artisan migrate --force && php artisan optimize && pm2 restart queue-content queue-stat && php artisan storage:link"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.SSH_SOURCE_DIR }} && php artisan migrate --force && php artisan optimize && pm2 restart schedule queue-content queue-stat && php artisan storage:link"
