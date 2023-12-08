@@ -14,7 +14,7 @@ module.exports = {
             max_restarts: 15,
         },
         {
-            name: 'queue-stat',
+            name: 'queuestat',
             interpreter: '/usr/bin/php8.1',
             script: './artisan',
             args: 'queue:work --queue=stat',
@@ -27,7 +27,7 @@ module.exports = {
             max_restarts: 15,
         },
         {
-            name: 'queue-content',
+            name: 'queuecontent',
             interpreter: '/usr/bin/php8.1',
             script: './artisan',
             args: 'queue:work --queue=content',
