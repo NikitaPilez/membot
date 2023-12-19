@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Enum\SocialNetwork;
 use App\Jobs\CheckPotentialVideoJob;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class CheckPotentialVideosInYoutube extends Command
 {
@@ -27,6 +28,7 @@ class CheckPotentialVideosInYoutube extends Command
      */
     public function handle(): void
     {
+        Log::channel('content')->info('Чек ютуб видео');
         CheckPotentialVideoJob::dispatch(SocialNetwork::Youtube->value)->onQueue('content');
     }
 }
