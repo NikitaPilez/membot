@@ -42,20 +42,20 @@ class InstagramContentVideo implements ContentVideoInterface
             ]);
 
             $page = $browser->createPage();
-            $page->navigate('https://snapinsta.app/ru')->waitForNavigation();
-            $elem = $page->dom()->querySelector('#url');
+            $page->navigate('https://ru.savefrom.net/132/download-from-instagram')->waitForNavigation();
+            $elem = $page->dom()->querySelector('#sf_url');
 
             $elem->click();
             $elem->sendKeys(Str::finish($videoUrl, '/'));
 
             sleep(1);
 
-            $page->evaluate("document.querySelector('button[type=\"submit\"]').click()");
+            $page->evaluate("document.querySelector('#sf_submit').click()");
 
-            sleep(3);
+            sleep(5);
 
-            $sourceUrl = $page->evaluate("document.querySelector('.download-media').href")->getReturnValue();
-            $previewImgUrl = $page->evaluate("document.querySelector('img').src")->getReturnValue();
+            $sourceUrl = $page->evaluate("document.querySelector('.link-download').href")->getReturnValue();
+            $previewImgUrl = $page->evaluate("document.querySelector('.thumb').src")->getReturnValue();
 
             $browser->close();
 
