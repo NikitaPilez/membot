@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Channel;
 use App\Models\Video;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -46,6 +47,26 @@ class TelegramService
         }
 
         Log::channel('content')->error('Видео не отправлено в телеграм канал.', array_merge($params, $response));
+
+        return false;
+    }
+
+    public function sendNotificationAboutNewPost(Channel $channel): bool
+    {
+        $params = [
+            'chat_id' => config('services.telegram.chat_id_dev'),
+            'text' => 'Новый пост на канале ' . $channel->name,
+        ];
+
+        $response = Http::post($this->apiUrl . '/sendMessage', $params)->json();
+
+        if (array_key_exists('ok', $response) && $response['ok']) {
+            Log::channel('content')->info('Уведомление успешно отправлено в телеграм канал.', $params);
+
+            return true;
+        }
+
+        Log::channel('content')->error('Уведомление не отправлено в телеграм канал.', array_merge($params, $response));
 
         return false;
     }

@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $youtube_id
  * @property string|null $parse_new_video_link
  * @property boolean $is_active
+ * @property boolean $is_notify
  * @property string|null $tgstat_link
  * @property Carbon $created_at
  */
@@ -29,6 +30,7 @@ class Channel extends Model
         'youtube_id',
         'parse_new_video_link',
         'is_active',
+        'is_notify',
         'tgstat_link',
     ];
 

@@ -12,6 +12,13 @@ use Illuminate\Support\Facades\Log;
 
 class CheckPotentialVideoService
 {
+    private TelegramService $telegramService;
+
+    public function __construct(TelegramService $telegramService)
+    {
+        $this->telegramService = $telegramService;
+    }
+
     public function run(string $socialNetwork): void
     {
         $channels =  Channel::query()
@@ -60,6 +67,10 @@ class CheckPotentialVideoService
                 Log::channel('content')->info('Новый пост с канала ' . $channel->name, [
                     'post_id' => $channelPost->id,
                 ]);
+
+                if ($channel->is_notify) {
+                    $this->telegramService->sendNotificationAboutNewPost($channel);
+                }
             }
         }
     }
