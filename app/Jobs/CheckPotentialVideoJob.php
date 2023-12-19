@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Console\Commands\CheckPotentialVideos;
 use App\Services\CheckPotentialVideoService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -15,12 +14,14 @@ class CheckPotentialVideoJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    private string $socialNetwork;
+
     /**
      * Create a new job instance.
      */
-    public function __construct()
+    public function __construct(string $socialNetwork)
     {
-        //
+        $this->socialNetwork = $socialNetwork;
     }
 
     /**
@@ -29,6 +30,6 @@ class CheckPotentialVideoJob implements ShouldQueue
      */
     public function handle(CheckPotentialVideoService $service): void
     {
-        $service->run();
+        $service->run($this->socialNetwork);
     }
 }

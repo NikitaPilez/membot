@@ -6,20 +6,17 @@ use App\DTO\ChannelPostDTO;
 use App\Helpers\CheckPotentialVideo\CheckPotentialVideoFromTelegram;
 use App\Helpers\CheckPotentialVideo\CheckPotentialVideoFromYoutube;
 use App\Helpers\CheckPotentialVideo\CheckPotentialVideoInterface;
-use App\Helpers\TGStat;
 use App\Models\Channel;
 use App\Models\ChannelPost;
-use HeadlessChromium\BrowserFactory;
-use HeadlessChromium\Dom\Node;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class CheckPotentialVideoService
 {
-    public function run(): void
+    public function run(string $socialNetwork): void
     {
         $channels =  Channel::query()
             ->where('is_active', 1)
+            ->where('type', $socialNetwork)
             ->get();
 
         foreach ($channels as $channel) {

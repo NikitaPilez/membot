@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Console;
 
 use App\Console\Commands\CalculateAveragePostStatsCommand;
-use App\Console\Commands\CheckPotentialVideos;
+use App\Console\Commands\CheckPotentialVideosInTelegram;
+use App\Console\Commands\CheckPotentialVideosInYoutube;
 use App\Console\Commands\SendVideoInTelegramCommand;
 use App\Console\Commands\UpdateChannelPostStatCommand;
 use Illuminate\Console\Scheduling\Schedule;
@@ -22,7 +23,10 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command(SendVideoInTelegramCommand::class)->everyMinute();
-        $schedule->command(CheckPotentialVideos::class)->everyFifteenMinutes();
+        $schedule->command(CheckPotentialVideosInTelegram::class)->everyFifteenMinutes();
+        $schedule->command(CheckPotentialVideosInYoutube::class)->hourly()->when(function () {
+            return now()->hour >= 7 && now()->hour <= 19;
+        });
         $schedule->command(UpdateChannelPostStatCommand::class)->everyMinute();
 //        $schedule->command(CalculateAveragePostStatsCommand::class)->hourly();
 
