@@ -46,5 +46,6 @@ class Video extends Model
 
     protected $casts = [
         'publication_date' => 'datetime',
+        'sent_at' => 'datetime',
     ];
 }

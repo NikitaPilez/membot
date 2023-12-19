@@ -42,7 +42,7 @@ class VideoResource extends Resource
                 Forms\Components\TextInput::make('url')->label('Урл видео')->disabled(),
                 Forms\Components\TextInput::make('content_url')->label('Урл исходного видео')->disabled(),
                 Forms\Components\TextInput::make('type')->label('Соц. сеть')->disabled(),
-                Forms\Components\DateTimePicker::make('sent_at')->label('Когда отправлено?')->disabled(),
+                Forms\Components\DateTimePicker::make('sent_at')->label('Когда отправлено?')->disabled()->native(false)->timezone('Europe/Minsk'),
                 Forms\Components\DateTimePicker::make('publication_date')->label('Время отправки')->native(false)->timezone('Europe/Minsk'),
                 Forms\Components\Grid::make([
                     'default' => 1,
