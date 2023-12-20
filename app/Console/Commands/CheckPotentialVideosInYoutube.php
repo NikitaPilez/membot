@@ -28,7 +28,6 @@ class CheckPotentialVideosInYoutube extends Command
      */
     public function handle(): void
     {
-        Log::channel('content')->info('Чек ютуб видео');
         CheckPotentialVideoJob::dispatch(SocialNetwork::Youtube->value)->onQueue('content');
     }
 }
