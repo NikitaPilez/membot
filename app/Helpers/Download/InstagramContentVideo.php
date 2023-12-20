@@ -47,11 +47,14 @@ class InstagramContentVideo implements ContentVideoInterface
 
             $elem->click();
             $elem->sendKeys(Str::finish($videoUrl, '/'));
-
             $page->evaluate("document.querySelector('#submit').click()");
-            sleep(1);
-            $page->evaluate("document.querySelector('#ad-vignette').remove()");
-            sleep(7);
+
+            sleep(4);
+
+            $page->evaluate("document.querySelector('.modal__footer button').click()");
+
+            sleep(10);
+
 
             $sourceUrl = $page->evaluate("document.querySelector('.download-wrapper a').href")->getReturnValue();
             $previewImgUrl = $page->evaluate("document.querySelector('.preview').src")->getReturnValue();
