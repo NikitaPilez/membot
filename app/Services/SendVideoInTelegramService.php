@@ -47,9 +47,9 @@ class SendVideoInTelegramService
 
             $fileName = $this->googleDriveService->downloadFile($fileFromDrive);
 
-            if ($this->checkIsNeedCompressVideo($fileName)) {
-                FFMpegHelper::compressVideo($fileName);
-            }
+//            if ($this->checkIsNeedCompressVideo($fileName)) {
+//                FFMpegHelper::compressVideo($fileName);
+//            }
 
             $result = $this->telegramService->sendVideo($video);
 
