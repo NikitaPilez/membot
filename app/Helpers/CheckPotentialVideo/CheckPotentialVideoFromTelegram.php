@@ -5,11 +5,10 @@ namespace App\Helpers\CheckPotentialVideo;
 use App\DTO\ChannelPostDTO;
 use App\Helpers\TGStat;
 use App\Models\Channel;
-use App\Models\ChannelPost;
 use HeadlessChromium\BrowserFactory;
 use HeadlessChromium\Dom\Node;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class CheckPotentialVideoFromTelegram implements CheckPotentialVideoInterface
 {
@@ -52,7 +51,8 @@ class CheckPotentialVideoFromTelegram implements CheckPotentialVideoInterface
                 $channelPosts[] = new ChannelPostDTO(
                     id: $channelPostTGStatDTO->id,
                     createdAt: $channelPostTGStatDTO->createdAt,
-                    description: $channelPostTGStatDTO->description
+                    description: $channelPostTGStatDTO->description,
+                    link: Str::finish($channel->url, '/') . $channelPostTGStatDTO->id,
                 );
             } else {
                 Log::channel('content')->error('Не достаточно информации о посте.', [

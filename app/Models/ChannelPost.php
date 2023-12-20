@@ -14,6 +14,7 @@ use Illuminate\Support\Carbon;
  * @property int $channel_id
  * @property string|null $description
  * @property string|null $image
+ * @property string|null $link
  * @property int $post_id
  * @property Carbon $publication_at
  * @property Carbon $created_at
@@ -29,6 +30,7 @@ class ChannelPost extends Model
         'description',
         'post_id',
         'image',
+        'link',
         'publication_at',
     ];
 

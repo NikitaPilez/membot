@@ -49,6 +49,7 @@ class CheckPotentialVideoFromYoutube implements CheckPotentialVideoInterface
                 $stringId = $item['id']['videoId'] ?? null;
                 $createdAt = $item['snippet']['publishedAt'] ?? null;
                 $image = $item['snippet']['thumbnails']['high']['url'] ?? null;
+                $videoId = $item['id']['videoId'] ?? null;
 
                 $hash = hash_hmac('sha256', $stringId, '1');
                 $id = (int) fmod(hexdec($hash), 10000) + 1;
@@ -57,7 +58,8 @@ class CheckPotentialVideoFromYoutube implements CheckPotentialVideoInterface
                     id: $id,
                     createdAt: Carbon::parse($createdAt),
                     description: $description,
-                    image: $image
+                    image: $image,
+                    link: 'https://www.youtube.com/shorts/' . $videoId,
                 );
             }
         }

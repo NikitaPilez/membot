@@ -7,6 +7,7 @@ use App\Filament\Resources\ChannelPostResource\RelationManagers;
 use App\Models\ChannelPost;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
@@ -15,6 +16,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\HtmlString;
 
 class ChannelPostResource extends Resource
 {
@@ -48,6 +50,10 @@ class ChannelPostResource extends Resource
                 Forms\Components\DateTimePicker::make('publication_at')
                     ->label('Время публикации?')
                     ->disabled(),
+                Forms\Components\Placeholder::make('link')->label('')
+                    ->content(function (Get $get) {
+                        return new HtmlString('<a target="_blank" style="text-decoration: underline" href="' . $get('link') . '">Ссылка на пост</a>');
+                    }),
             ]);
     }
 
@@ -63,9 +69,10 @@ class ChannelPostResource extends Resource
                     ->label('Изображение')
                     ->width(150)
                     ->height(150),
-                Tables\Columns\TextColumn::make('post_id')
+                Tables\Columns\ViewColumn::make('link')
+                    ->view('tables.columns.channel-post-link')
                     ->toggleable()
-                    ->label('ID поста'),
+                    ->label('Ссылка на пост'),
                 Tables\Columns\TextColumn::make('publication_at')
                     ->toggleable()
                     ->label('Время опубликования')
@@ -73,6 +80,10 @@ class ChannelPostResource extends Resource
                 Tables\Columns\TextColumn::make('description')
                     ->toggleable()
                     ->label('Описание')
+                    ->limit(30),
+                Tables\Columns\TextColumn::make('post_id')
+                    ->toggleable()
+                    ->label('ID поста'),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('channel')->label('Канал')

@@ -61,6 +61,7 @@ class CheckPotentialVideoService
                     'post_id' => $parsedChannelPost->id,
                     'description' => $parsedChannelPost->description,
                     'image' => $parsedChannelPost->image,
+                    'link' => $parsedChannelPost->link,
                     'publication_at' => $parsedChannelPost->createdAt,
                 ]);
 
