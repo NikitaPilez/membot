@@ -53,7 +53,7 @@ class VideoResource extends Resource
                         ->content(function (Get $get) {
                             return new HtmlString('<a target="_blank" style="text-decoration: underline" href="https://drive.google.com/file/d/' . $get('google_file_id') . '/view">Ссылка на видео в гугл диске</a>');
                         }),
-                    Forms\Components\FileUpload::make('preview_image_path')->image()->disk('public')->disabled(),
+                    Forms\Components\FileUpload::make('preview_image_path')->image()->disk('public'),
                 ]),
             ]);
     }

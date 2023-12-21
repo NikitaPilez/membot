@@ -97,7 +97,7 @@ class DownloadVideoService
         try {
             $image = Image::make($previewImgUrl);
             $image->encode('webp', 75);
-            $fileName = date('Y-m-d H:i') . '.webp';
+            $fileName = date('Y-m-d H:i:s') . '.webp';
             $savePath = Storage::disk('public')->path($fileName);
             $image->save($savePath);
         } catch (Exception $exception) {
