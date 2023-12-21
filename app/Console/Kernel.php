@@ -27,7 +27,7 @@ class Kernel extends ConsoleKernel
         $schedule->command(CheckPotentialVideosInYoutube::class)->hourly()->when(function () {
             return now()->hour >= 7 && now()->hour <= 19;
         });
-        $schedule->command(UpdateChannelPostStatCommand::class)->everyMinute();
+//        $schedule->command(UpdateChannelPostStatCommand::class)->everyMinute();
 //        $schedule->command(CalculateAveragePostStatsCommand::class)->hourly();
 
         $schedule->command('telescope:prune --hours=48')->daily();

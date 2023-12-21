@@ -30,19 +30,19 @@ class SendNotificationAboutActualPost
         $actualPostDto = $this->checkActualPostService->check($event->channelPostStat);
 
         if ($actualPostDto->isMostShared) {
-            Log::channel('content')->info('Актуальный пост по репостам', [
-                'channel_post' => $channelPostStat->post->description,
-                'channel_id' => $channelPostStat->post->channel_id,
-                'avg_shares' => $actualPostDto->avgShares,
-            ]);
+//            Log::channel('content')->info('Актуальный пост по репостам', [
+//                'channel_post' => $channelPostStat->post->description,
+//                'channel_id' => $channelPostStat->post->channel_id,
+//                'avg_shares' => $actualPostDto->avgShares,
+//            ]);
         }
 
         if ($actualPostDto->isMostViewed) {
-            Log::channel('content')->info('Актуальный пост по просмотрам', [
-                'channel_post' => $channelPostStat->post->description,
-                'channel_id' => $channelPostStat->post->channel_id,
-                'avg_views' => $actualPostDto->avgViews,
-            ]);
+//            Log::channel('content')->info('Актуальный пост по просмотрам', [
+//                'channel_post' => $channelPostStat->post->description,
+//                'channel_id' => $channelPostStat->post->channel_id,
+//                'avg_views' => $actualPostDto->avgViews,
+//            ]);
         }
     }
 }
