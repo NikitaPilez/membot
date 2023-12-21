@@ -9,6 +9,7 @@ use Exception;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
@@ -17,6 +18,8 @@ class DownloadVideoService
 {
     public function download(string $type, string $url, bool $isProd, ?string $description, ?string $comment): void
     {
+        Cache::put('video-status', 'processing', 60);
+
         /** @var ContentVideoInterface $videoDownloader */
         $videoDownloader = Utils::getVideoContentHelper($type);
 
@@ -27,6 +30,8 @@ class DownloadVideoService
                 'videoUrl' => $url,
                 'message' => $contentUrlResponse->message,
             ]);
+
+            Cache::put('video-status', 'error', 60);
 
             return;
         }
@@ -44,6 +49,8 @@ class DownloadVideoService
                 'url' => $contentUrlResponse->sourceUrl,
             ]);
 
+            Cache::put('video-status', 'error', 60);
+
             return;
         }
 
@@ -58,6 +65,8 @@ class DownloadVideoService
                 'sourceUrl' => $url,
                 'contentUrl' => $contentUrlResponse->sourceUrl,
             ]);
+
+            Cache::put('video-status', 'error', 60);
 
             return;
         }
@@ -90,6 +99,8 @@ class DownloadVideoService
             'is_prod' => $isProd,
             'description' => $description,
         ]);
+
+        Cache::put('video-status', 'success', 60);
     }
 
     public function compressPreviewImage(string $previewImgUrl): ?string
