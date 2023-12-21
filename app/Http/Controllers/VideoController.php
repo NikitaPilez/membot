@@ -6,8 +6,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\DownloadVideoRequest;
 use App\Jobs\DownloadVideoJob;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class VideoController
@@ -31,5 +33,12 @@ class VideoController
         DownloadVideoJob::dispatch($url, $type, $isProd, $description, $comment)->onQueue('content');
 
         return back();
+    }
+
+    public function getStatus(): JsonResponse
+    {
+        return response()->json([
+            'status' => Cache::get('video-status'),
+        ]);
     }
 }
