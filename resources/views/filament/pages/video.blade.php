@@ -32,7 +32,7 @@
 <script>
     function makeRequest() {
         $.ajax({
-            url: 'http://127.0.0.1:8000/admin/download/status/',
+            url: 'https://mem.nmikser.xyz/admin/download/status/',
             method: 'GET',
             success: function (response) {
                 console.log(response.status);
