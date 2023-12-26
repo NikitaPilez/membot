@@ -26,7 +26,8 @@ Route::get('sendTelegram/{video}', [TelegramController::class, 'send'])->name('s
 Route::group(['prefix' => 'admin'], function () {
     Route::group(['prefix' => 'download'], function () {
         Route::post('video', [VideoController::class, 'downloadVideo'])->name('download.video');
-        Route::get('status', [VideoController::class, 'getStatus'])->name('download.status');
+        Route::get('status/get', [VideoController::class, 'getStatus'])->name('download.status.get');
+        Route::get('status/delete', [VideoController::class, 'deleteStatus'])->name('download.status.delete');
     });
 });
 

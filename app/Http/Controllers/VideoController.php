@@ -41,4 +41,11 @@ class VideoController
             'status' => Cache::get('video-status'),
         ]);
     }
+
+    public function deleteStatus(): JsonResponse
+    {
+        return response()->json([
+            'status' => Cache::delete('video-status'),
+        ]);
+    }
 }

@@ -1,3 +1,40 @@
+<style>
+    .video-status {
+        z-index: 25;
+        display: block;
+        position: fixed;
+        top: 0;
+        right: 0;
+        color:  black;
+        background-color: #e7e7e7;
+        padding: 20px;
+        margin: 10px;
+        border-radius: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        animation: pulse 2s infinite;
+    }
+
+    #close-button {
+        cursor: pointer;
+        font-size: 18px;
+        color: #333; /* Цвет крестика */
+        position: absolute;
+        top: 5px;
+        right: 5px;
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        50% {
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+        100% {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    }
+</style>
 <x-filament-panels::page>
     <form class="mt-3" id="download" enctype="multipart/form-data" action="{{ route('download.video') }}" method="POST">
         @csrf
@@ -27,18 +64,43 @@
         </div>
         <button type="submit" class="btn btn-primary mt-3">Отправить</button>
     </form>
+    <div id="video-status">
+        <div id="status"></div>
+        <span id="close-button">&times;</span>
+    </div>
 </x-filament-panels::page>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
     function makeRequest() {
+
         $.ajax({
-            url: 'https://mem.nmikser.xyz/admin/download/status/',
+            url: window.location.protocol + '//' + window.location.host + '/admin/download/status/get',
             method: 'GET',
             success: function (response) {
-                console.log(response.status);
+                console.log(response);
+
+                if (response.status) {
+                    $('#video-status').addClass('video-status')
+                    $('#status').text('Статус загрузки видео - ' + response.status)
+                } else {
+                    $('#video-status').removeClass('video-status');
+                }
             },
         });
     }
+
+    $(function() {
+        $('#close-button').click(function() {
+
+            $('#video-status').removeClass('video-status');
+            $('#status').text('');
+
+            $.ajax({
+                url: window.location.protocol + '//' + window.location.host + '/admin/download/status/delete',
+                method: 'GET',
+            });
+        });
+    });
 
     setInterval(function () {
         makeRequest()
