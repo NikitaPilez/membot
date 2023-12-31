@@ -59,7 +59,7 @@ class SendVideoInTelegramService
                 $video->publication_date = Carbon::now();
                 $video->save();
 
-                Storage::disk('public')->delete($video->name);
+//                Storage::disk('public')->delete($video->name);
             }
         } catch (Exception $exception) {
             Log::channel('content')->info('Ошибка при получении информации о файле.', [
