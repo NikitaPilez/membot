@@ -82,6 +82,7 @@ class DownloadVideoService
         $lastVideosDateAndCount = Video::query()
             ->selectRaw('count(*) as count')
             ->where('publication_date', '>', now())
+            ->where('is_prod', 1)
             ->whereNotNull('google_file_id')
             ->groupByRaw('date(publication_date)')
             ->orderByRaw('date(publication_date) desc')
@@ -92,6 +93,7 @@ class DownloadVideoService
             $nextPublicationDate = today()->addDay()->startOfDay()->addHours(8)->addMinutes(rand(1, 50));
         } else {
             $lastVideo = Video::query()
+                ->where('is_prod', 1)
                 ->whereNotNull('google_file_id')
                 ->orderByDesc('publication_date')
                 ->first()
