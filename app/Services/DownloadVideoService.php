@@ -88,7 +88,7 @@ class DownloadVideoService
             ->first()
         ;
 
-        if ($lastVideosDateAndCount->count > 3) {
+        if ($lastVideosDateAndCount?->count > 3) {
             $nextPublicationDate = today()->addDay()->startOfDay()->addHours(8)->addMinutes(rand(1, 50));
         } else {
             $lastVideo = Video::query()
