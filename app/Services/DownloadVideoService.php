@@ -54,7 +54,7 @@ class DownloadVideoService
             return;
         }
 
-        $fileName = $type . date('d-m-Y_H:i') . '.mp4';
+        $fileName = $type . date('d-m-Y_H:i:s') . '.mp4';
 
         /** @var GoogleDriveService $googleDriveService */
         $googleDriveService = app(GoogleDriveService::class);
@@ -79,13 +79,29 @@ class DownloadVideoService
 
         $previewImageUrl = $this->getPreviewImageUrl($contentUrlResponse->sourceUrl, $contentUrlResponse->previewImgUrl);
 
-        $lastVideo = Video::query()
-            ->where('is_sent', 0)
-            ->whereNotNull('google_file_id')
+        $lastVideosDateAndCount = Video::query()
+            ->selectRaw('count(*) as count')
             ->where('publication_date', '>', now())
-            ->orderByDesc('publication_date')
+            ->whereNotNull('google_file_id')
+            ->groupByRaw('date(publication_date)')
+            ->orderByRaw('date(publication_date) desc')
             ->first()
         ;
+
+        if ($lastVideosDateAndCount->count > 3) {
+            $nextPublicationDate = today()->addDay()->startOfDay()->addHours(8)->addMinutes(rand(1, 50));
+        } else {
+            $lastVideo = Video::query()
+                ->whereNotNull('google_file_id')
+                ->orderByDesc('publication_date')
+                ->first()
+            ;
+
+            $nextPublicationDate = now()->diffInHours($lastVideo->publication_date, false) < -3
+                ? now()
+                : $lastVideo->publication_date->addMinutes(rand(180, 210))
+            ;
+        }
 
         Video::query()->create([
             'google_file_id' => $driveFile->getId(),
@@ -95,7 +111,7 @@ class DownloadVideoService
             'type' => $type,
             'comment' => $comment,
             'preview_image_path' => $previewImageUrl,
-            'publication_date' => $lastVideo ? Carbon::parse($lastVideo->publication_date)->addMinutes(rand(180, 210)) : now()->addMinutes(rand(210, 300)),
+            'publication_date' => $nextPublicationDate,
             'is_prod' => $isProd,
             'description' => $description,
         ]);
