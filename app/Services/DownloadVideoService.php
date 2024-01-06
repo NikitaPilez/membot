@@ -80,7 +80,7 @@ class DownloadVideoService
         $previewImageUrl = $this->getPreviewImageUrl($contentUrlResponse->sourceUrl, $contentUrlResponse->previewImgUrl);
 
         $lastVideosDateAndCount = Video::query()
-            ->selectRaw('count(*) as count')
+            ->selectRaw('date(publication_date) as date, count(*) as count')
             ->where('publication_date', '>', now())
             ->where('is_prod', 1)
             ->whereNotNull('google_file_id')
@@ -90,7 +90,11 @@ class DownloadVideoService
         ;
 
         if ($lastVideosDateAndCount?->count > 3) {
-            $nextPublicationDate = today()->addDay()->startOfDay()->addHours(8)->addMinutes(rand(1, 50));
+            $nextPublicationDate = Carbon::parse($lastVideosDateAndCount->date)
+                ->addDay()
+                ->addHours(8)
+                ->addMinutes(rand(1, 59))
+            ;
         } else {
             $lastVideo = Video::query()
                 ->where('is_prod', 1)
@@ -99,10 +103,21 @@ class DownloadVideoService
                 ->first()
             ;
 
-            $nextPublicationDate = now()->diffInHours($lastVideo->publication_date, false) < -3
-                ? now()
-                : $lastVideo->publication_date->addMinutes(rand(180, 210))
-            ;
+            if (now()->diffInHours($lastVideo->publication_date, false) < -3) {
+                $nowHours = (int)now()->format('H');
+
+                $nextPublicationDate = $nowHours > 24 || $nowHours < 8
+                    ? today()->addDay()->addHours(8)->addMinutes(rand(1, 59))
+                    : now()
+                ;
+            } else {
+                $nowHours = (int)$lastVideo->publication_date->format('H');
+
+                $nextPublicationDate = $nowHours > 24 || $nowHours < 8
+                    ? today()->addDay()->addHours(8)->addMinutes(rand(1, 59))
+                    : $lastVideo->publication_date->addHours(3)->addMinutes(rand(1, 30))
+                ;
+            }
         }
 
         Video::query()->create([
