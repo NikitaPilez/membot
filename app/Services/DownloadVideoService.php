@@ -106,15 +106,15 @@ class DownloadVideoService
             if (now()->diffInHours($lastVideo->publication_date, false) < -3) {
                 $nowHours = (int)now()->format('H');
 
-                $nextPublicationDate = $nowHours > 24 || $nowHours < 8
-                    ? today()->addDay()->addHours(8)->addMinutes(rand(1, 59))
+                $nextPublicationDate = $nowHours < 8
+                    ? today()->addHours(8)->addMinutes(rand(1, 59))
                     : now()
                 ;
             } else {
-                $nowHours = (int)$lastVideo->publication_date->format('H');
+                $nowHours = (int)$lastVideo->publication_date->addHours(3)->format('H');
 
-                $nextPublicationDate = $nowHours > 24 || $nowHours < 8
-                    ? today()->addDay()->addHours(8)->addMinutes(rand(1, 59))
+                $nextPublicationDate = $nowHours < 8
+                    ? today()->addHours(8)->addMinutes(rand(1, 59))
                     : $lastVideo->publication_date->addHours(3)->addMinutes(rand(1, 30))
                 ;
             }
