@@ -95,8 +95,6 @@ class DownloadVideoService
                 ->addHours(8)
                 ->addMinutes(rand(1, 59))
             ;
-            info('1', [$nextPublicationDate]);
-
         } else {
             $lastVideo = Video::query()
                 ->where('is_prod', 1)
@@ -112,8 +110,6 @@ class DownloadVideoService
                     ? today()->addHours(8)->addMinutes(rand(1, 59))
                     : now()->addMinutes(2)
                 ;
-                info('2', [$nextPublicationDate]);
-
             } else {
                 $nowHours = (int)$lastVideo->publication_date->addHours(3)->format('H');
 
@@ -121,23 +117,21 @@ class DownloadVideoService
                     ? today()->addHours(8)->addMinutes(rand(1, 59))
                     : $lastVideo->publication_date->addHours(3)->addMinutes(rand(1, 30))
                 ;
-                info('3', [$nextPublicationDate]);
             }
         }
 
-        info('qwe', [$nextPublicationDate]);
-//        Video::query()->create([
-//            'google_file_id' => $driveFile->getId(),
-//            'name' => $fileName,
-//            'url' => $url,
-//            'content_url' => $contentUrlResponse->sourceUrl,
-//            'type' => $type,
-//            'comment' => $comment,
-//            'preview_image_path' => $previewImageUrl,
-//            'publication_date' => $nextPublicationDate,
-//            'is_prod' => $isProd,
-//            'description' => $description,
-//        ]);
+        Video::query()->create([
+            'google_file_id' => $driveFile->getId(),
+            'name' => $fileName,
+            'url' => $url,
+            'content_url' => $contentUrlResponse->sourceUrl,
+            'type' => $type,
+            'comment' => $comment,
+            'preview_image_path' => $previewImageUrl,
+            'publication_date' => $nextPublicationDate,
+            'is_prod' => $isProd,
+            'description' => $description,
+        ]);
 
         Cache::put('video-status', 'success');
     }
