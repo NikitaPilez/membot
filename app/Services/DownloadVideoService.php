@@ -108,7 +108,7 @@ class DownloadVideoService
 
                 $nextPublicationDate = $nowHours < 8
                     ? today()->addHours(8)->addMinutes(rand(1, 59))
-                    : now()
+                    : now()->addMinutes(2)
                 ;
             } else {
                 $nowHours = (int)$lastVideo->publication_date->addHours(3)->format('H');
@@ -120,18 +120,19 @@ class DownloadVideoService
             }
         }
 
-        Video::query()->create([
-            'google_file_id' => $driveFile->getId(),
-            'name' => $fileName,
-            'url' => $url,
-            'content_url' => $contentUrlResponse->sourceUrl,
-            'type' => $type,
-            'comment' => $comment,
-            'preview_image_path' => $previewImageUrl,
-            'publication_date' => $nextPublicationDate,
-            'is_prod' => $isProd,
-            'description' => $description,
-        ]);
+        info('qwe', [$nextPublicationDate]);
+//        Video::query()->create([
+//            'google_file_id' => $driveFile->getId(),
+//            'name' => $fileName,
+//            'url' => $url,
+//            'content_url' => $contentUrlResponse->sourceUrl,
+//            'type' => $type,
+//            'comment' => $comment,
+//            'preview_image_path' => $previewImageUrl,
+//            'publication_date' => $nextPublicationDate,
+//            'is_prod' => $isProd,
+//            'description' => $description,
+//        ]);
 
         Cache::put('video-status', 'success');
     }
